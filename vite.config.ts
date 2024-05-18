@@ -44,6 +44,7 @@ export default defineConfig(async () => ({
         'vue',
         'vue-i18n',
         'pinia',
+        '@vueuse/core',
         VueRouterAutoImports,
         {
           // add any other imports you were relying on

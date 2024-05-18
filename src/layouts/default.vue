@@ -5,6 +5,9 @@ import NetworkList from '~/components/NetworkList.vue'
 import NetworkListAction from '~/components/NetworkListAction.vue'
 
 const { locale, t } = useI18n()
+const appStore = useAppStore()
+
+const { isDark } = storeToRefs(appStore)
 const menuOptions = computed(() => [
   {
     label: t('layout.default.config'),
@@ -56,6 +59,14 @@ onMounted(async () => {
               </template>
             </n-button>
           </n-dropdown>
+          <n-switch v-model:value="isDark">
+            <template #checked-icon>
+              <n-icon i-carbon-moon />
+            </template>
+            <template #unchecked-icon>
+              <n-icon i-carbon-sun />
+            </template>
+          </n-switch>
           <n-checkbox v-if="platformName === 'windows'" disabled>
             路由广播
           </n-checkbox>
