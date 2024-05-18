@@ -30,6 +30,12 @@ export function DEFAULT_NETWORK_CONFIG(): NetworkConfig {
   }
 }
 
+export function DEFAULT_NETWORK_OTHER_CONFIG(): NetworkOtherConfig {
+  return {
+    token: true,
+  }
+}
+
 export enum NetworkStatus {
   OFF = 0,
   STARTING,
@@ -43,6 +49,11 @@ export interface Network {
   config: NetworkConfig
   status: NetworkStatus
   detail?: NetworkInstanceInfo
+  otherConfig: NetworkOtherConfig
+}
+
+export interface NetworkOtherConfig {
+  token: boolean
 }
 
 export interface NetworkInstanceInfo {

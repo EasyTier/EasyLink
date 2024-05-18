@@ -1,37 +1,45 @@
 <script setup lang="ts">
 import { platform } from '@tauri-apps/plugin-os'
+import { availableLocales, loadLanguageAsync } from '~/modules/i18n'
 import NetworkList from '~/components/NetworkList.vue'
 import NetworkListAction from '~/components/NetworkListAction.vue'
 
-const { availableLocales, locale } = useI18n()
-// const platformName = async () => await platform()
-const menuOptions = [
+const { locale, t } = useI18n()
+const menuOptions = computed(() => [
   {
-    label: '设置',
+    label: t('layout.default.config'),
     key: 'config',
     disabled: true,
   },
   {
-    label: '多语言',
+    label: t('layout.default.language'),
     key: 'i18n',
     children: availableLocales.map(l => ({
-      label: l,
+      label: t(`i18n.${l}`),
       key: l,
       disabled: l === locale.value,
+      props: {
+        onClick: async () => await loadLanguageAsync(l),
+      },
     })),
-    disabled: true,
   },
   {
-    label: '检查更新',
+    label: t('layout.default.checkUpdate'),
     key: 'update',
     disabled: true,
   },
   {
-    label: '关于',
+    label: t('layout.default.about'),
     key: 'about',
     disabled: true,
   },
-]
+])
+
+const platformName = ref('')
+
+onMounted(async () => {
+  platformName.value = await platform()
+})
 </script>
 
 <template>
@@ -48,7 +56,7 @@ const menuOptions = [
               </template>
             </n-button>
           </n-dropdown>
-          <n-checkbox disabled>
+          <n-checkbox v-if="platformName === 'windows'" disabled>
             路由广播
           </n-checkbox>
         </n-flex>

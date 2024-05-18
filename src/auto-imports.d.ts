@@ -6,6 +6,7 @@
 export {}
 declare global {
   const DEFAULT_NETWORK_CONFIG: typeof import('./types/network')['DEFAULT_NETWORK_CONFIG']
+  const DEFAULT_NETWORK_OTHER_CONFIG: typeof import('./types/network')['DEFAULT_NETWORK_OTHER_CONFIG']
   const EffectScope: typeof import('vue')['EffectScope']
   const NetworkStatus: typeof import('./types/network')['NetworkStatus']
   const NetworkingMethod: typeof import('./types/network')['NetworkingMethod']
@@ -107,6 +108,7 @@ declare module 'vue' {
   interface GlobalComponents {}
   interface ComponentCustomProperties {
     readonly DEFAULT_NETWORK_CONFIG: UnwrapRef<typeof import('./types/network')['DEFAULT_NETWORK_CONFIG']>
+    readonly DEFAULT_NETWORK_OTHER_CONFIG: UnwrapRef<typeof import('./types/network')['DEFAULT_NETWORK_OTHER_CONFIG']>
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
     readonly NetworkStatus: UnwrapRef<typeof import('./types/network')['NetworkStatus']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('pinia')['acceptHMRUpdate']>
@@ -197,6 +199,7 @@ declare module '@vue/runtime-core' {
   interface GlobalComponents {}
   interface ComponentCustomProperties {
     readonly DEFAULT_NETWORK_CONFIG: UnwrapRef<typeof import('./types/network')['DEFAULT_NETWORK_CONFIG']>
+    readonly DEFAULT_NETWORK_OTHER_CONFIG: UnwrapRef<typeof import('./types/network')['DEFAULT_NETWORK_OTHER_CONFIG']>
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
     readonly NetworkStatus: UnwrapRef<typeof import('./types/network')['NetworkStatus']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('pinia')['acceptHMRUpdate']>

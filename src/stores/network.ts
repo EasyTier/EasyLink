@@ -7,6 +7,7 @@ export const useNetworkStore = defineStore('networkStore', () => {
     const newNetwork: Network = {
       config: DEFAULT_NETWORK_CONFIG(),
       status: NetworkStatus.OFF,
+      otherConfig: DEFAULT_NETWORK_OTHER_CONFIG(),
     }
     networkList.value.push(newNetwork)
   }

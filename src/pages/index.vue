@@ -14,19 +14,6 @@ const currentNetwork = computed<Network | undefined>(() => {
   return networkList.value.find(item => item.config.id === networkCurrent.value)
 })
 
-const networkGroupType = [
-  {
-    label: 'token',
-    value: 'token',
-  },
-  {
-    label: 'group',
-    value: 'group',
-  },
-]
-
-const groupType = ref('token')
-
 function removeThisNetwork(id: string) {
   if (id) {
     removeNetwork(id)
@@ -43,19 +30,18 @@ function addAndSelectNetwork() {
 
 <template>
   <n-flex h-full w-full align="center" justify="center">
-    <n-grid v-if="currentNetwork" :x-gap="8" :y-gap="8" :cols="8">
-      <n-gi offset="1" span="6">
+    <n-grid v-if="currentNetwork" :x-gap="8" :y-gap="8" :cols="10">
+      <n-gi offset="1" span="8">
         <n-flex :wrap="false">
           <n-input-group>
             <n-input
-              v-if="groupType === 'token'" type="text" :placeholder="t('page.index.tokenPlaceholder')"
-              size="medium" :style="{ width: '75%' }"
+              v-if="currentNetwork.otherConfig.token" type="text" :placeholder="t('page.index.tokenPlaceholder')"
+              size="medium" :style="{ width: '100%' }"
             />
             <template v-else>
-              <n-input type="text" :placeholder="t('page.index.networkNamePlaceholder')" :style="{ width: '40%' }" />
-              <n-input type="text" :placeholder="t('page.index.networkSecretPlaceholder')" :style="{ width: '35%' }" />
+              <n-input type="text" :placeholder="t('page.index.networkNamePlaceholder')" :style="{ width: '55%' }" />
+              <n-input type="text" :placeholder="t('page.index.networkSecretPlaceholder')" :style="{ width: '45%' }" />
             </template>
-            <n-select v-model:value="groupType" :style="{ width: '25%' }" :options="networkGroupType" />
           </n-input-group>
           <n-button type="primary" size="medium">
             {{ t('page.index.networking') }}
@@ -71,6 +57,16 @@ function addAndSelectNetwork() {
             {{ t('page.index.config') }}
           </n-button>
 
+          <n-checkbox v-model:checked="currentNetwork.otherConfig.token">
+            <template #icon>
+              <n-icon i-carbon-group-security />
+            </template>
+            {{ t('page.index.token') }}
+          </n-checkbox>
+        </n-flex>
+      </n-gi>
+      <n-gi offset="1" span="6">
+        <n-flex :wrap="false" align="center">
           <n-popconfirm
             :negative-text="t('page.index.delete')" :positive-text="t('page.index.cancel')"
             @negative-click="removeThisNetwork(currentNetwork.config.id)"
@@ -78,7 +74,7 @@ function addAndSelectNetwork() {
             <template #trigger>
               <n-button text>
                 <template #icon>
-                  <n-icon i-carbon-task-remove />
+                  <n-icon i-carbon-row-delete />
                 </template>
                 {{ t('page.index.confirmDeleteConfigMessage') }}
               </n-button>

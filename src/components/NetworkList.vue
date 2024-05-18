@@ -4,6 +4,7 @@ import { NetworkStatus } from '~/types/network'
 
 const networkStore = useNetworkStore()
 const tmpStore = useTmpStore()
+const { t } = useI18n()
 
 const { networkList } = storeToRefs(networkStore)
 const { networkFilter, networkCurrent } = storeToRefs(tmpStore)
@@ -32,15 +33,15 @@ function statusToTagType(status: NetworkStatus) {
 function statusToTagText(status: NetworkStatus) {
   switch (status) {
     case NetworkStatus.RUNNING:
-      return '运行中'
+      return t('network.status.running')
     case NetworkStatus.STARTING:
-      return '启动中'
+      return t('network.status.starting')
     case NetworkStatus.ERROR:
-      return '发生错误'
+      return t('network.status.error')
     case NetworkStatus.OFF:
-      return '未启动'
-    default:
-      return '未知'
+      return t('network.status.off')
+    case NetworkStatus.STOPPED:
+      return t('network.status.stopped')
   }
 }
 
@@ -56,7 +57,7 @@ function setActive(id: string) {
   <n-scrollbar :style="{ 'max-height': 'calc(100vh - 88px)' }">
     <n-list hoverable clickable>
       <n-flex v-if="networkFilter" justify="center" align="center" mb-2>
-        {{ `筛选结果: ${filterList.length} / ${networkList.length}` }}
+        {{ `${t('component.networkList.filterResults')}: ${filterList.length} / ${networkList.length}` }}
       </n-flex>
       <n-list-item
         v-for="net in filterList" :key="net.config.id"

@@ -1,15 +1,58 @@
 page:
   index:
     networking: Networking
-    tokenPlaceholder: Using the same concise token for networking
-    networkNamePlaceholder: Using the same group name for networking
-    networkSecretPlaceholder: Set group password (can be left blank)
+    tokenPlaceholder: Same concise token
+    networkNamePlaceholder: Same group name
+    networkSecretPlaceholder: Group password
     config: Config
     delete: Delete
     cancel: Cancel
     confirmDelete: Confirm delete
-    confirmDeleteConfigMessage: Are you sure to delete this configuration?
+    confirmDeleteConfigMessage: Delete config
     confirmDeleteConfigMessageTwice: Attention! Delete irreparable.
     addAndSelectNewNetwork: Add and select network configuration
     noNetworkTitle: No network configuration has been selected yet
     noNetworkDescription: Quickly select one or add another
+    token: token
+    networkGroup: group
+
+component:
+  networkConfig:
+    commonConfig: Common
+    advanceConfig: Advance
+    configName: Config Name
+    configNamePlaceholder: Used to differentiate configurations
+    deviceName: Device Name
+    deviceNamePlaceholder: 'Leave blank and default to: {0}'
+    virtualIP: Virtual IP
+    virtualIPPlaceholder: Virtual IP within the networking environment
+    dhcp: DHCP
+    peer: Peer Nodes
+    peerPlaceholder: Peer Nodes
+    vpnPortal: VPN Portal
+    subnetProxy: Subnet Proxy
+    rpcPortal: RPC Portal
+    listenerUrl: Listener Urls
+    empty: The network configuration does not exist
+    chooseOther: Look at other things
+  networkList:
+    filterResults: Filter Results
+
+layout:
+  default:
+    config: Config
+    checkUpdate: Check Update
+    about: About
+    language: Language
+
+i18n:
+  en: English
+  zh-CN: 简体中文
+
+network:
+  status:
+    running: running
+    starting: starting
+    error: error
+    off: off
+    stopped: stopped
