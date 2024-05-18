@@ -1,7 +1,7 @@
 {
   "productName": "easy-link",
   "version": "0.0.1",
-  "identifier": "org.easytier.gui.dev",
+  "identifier": "org.easytier.link.dev",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,9 @@
       {
         "title": "EasyLink",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "minHeight": 400,
+        "minWidth": 750
       }
     ],
     "security": {

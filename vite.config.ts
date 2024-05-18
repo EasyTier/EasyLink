@@ -10,6 +10,7 @@ import VueDevTools from 'vite-plugin-vue-devtools'
 import Unocss from 'unocss/vite'
 import VueRouter from 'unplugin-vue-router/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
+import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
@@ -48,6 +49,14 @@ export default defineConfig(async () => ({
           // add any other imports you were relying on
           'vue-router/auto': ['useLink'],
         },
+        {
+          'naive-ui': [
+            'useDialog',
+            'useMessage',
+            'useNotification',
+            'useLoadingBar',
+          ],
+        },
       ],
       dts: 'src/auto-imports.d.ts',
       dirs: [
@@ -64,6 +73,7 @@ export default defineConfig(async () => ({
       extensions: ['vue', 'md'],
       // allow auto import and register components used in markdown
       include: [/\.vue$/, /\.vue\?vue/, /\.md$/],
+      resolvers: [NaiveUiResolver()],
       dts: 'src/components.d.ts',
     }),
 

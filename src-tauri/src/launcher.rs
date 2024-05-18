@@ -29,7 +29,7 @@ pub struct NodeInfo {
 }
 
 #[derive(Default, Clone)]
-struct Data {
+pub struct Data {
     events: Arc<RwLock<VecDeque<(DateTime<Local>, GlobalCtxEvent)>>>,
     node: Arc<RwLock<NodeInfo>>,
     routes: Arc<RwLock<Vec<Route>>>,
@@ -42,7 +42,7 @@ pub struct Launcher {
     thread_handle: Option<std::thread::JoinHandle<()>>,
     running_cfg: String,
 
-    error_msg: Arc<RwLock<Option<String>>>,
+    error: Arc<RwLock<Option<String>>>,
     data: Data,
 }
 
@@ -52,7 +52,7 @@ impl Launcher {
         Self {
             instance_alive,
             thread_handle: None,
-            error_msg: Arc::new(RwLock::new(None)),
+            error: Arc::new(RwLock::new(None)),
             running_cfg: String::new(),
             stop_flag: Arc::new(AtomicBool::new(false)),
             data: Data::default(),
@@ -130,10 +130,10 @@ impl Launcher {
     where
         F: FnOnce() -> Result<TomlConfigLoader, anyhow::Error> + Send + Sync,
     {
-        let error_msg = self.error_msg.clone();
+        let error = self.error.clone();
         let cfg = cfg_generator();
         if let Err(e) = cfg {
-            error_msg.write().unwrap().replace(e.to_string());
+            error.write().unwrap().replace(e.to_string());
             return;
         }
 
@@ -167,14 +167,14 @@ impl Launcher {
                 data,
             ));
             if let Err(e) = ret {
-                error_msg.write().unwrap().replace(e.to_string());
+                error.write().unwrap().replace(e.to_string());
             }
             instance_alive.store(false, std::sync::atomic::Ordering::Relaxed);
         }));
     }
 
-    pub fn error_msg(&self) -> Option<String> {
-        self.error_msg.read().unwrap().clone()
+    pub fn error(&self) -> Option<String> {
+        self.error.read().unwrap().clone()
     }
 
     pub fn running(&self) -> bool {
@@ -182,20 +182,20 @@ impl Launcher {
             .load(std::sync::atomic::Ordering::Relaxed)
     }
 
-    pub fn get_events(&self) -> Vec<(DateTime<Local>, GlobalCtxEvent)> {
+    pub fn events(&self) -> Vec<(DateTime<Local>, GlobalCtxEvent)> {
         let events = self.data.events.read().unwrap();
         events.iter().cloned().collect()
     }
 
-    pub fn get_node(&self) -> NodeInfo {
+    pub fn node(&self) -> NodeInfo {
         self.data.node.read().unwrap().clone()
     }
 
-    pub fn get_routes(&self) -> Vec<Route> {
+    pub fn routes(&self) -> Vec<Route> {
         self.data.routes.read().unwrap().clone()
     }
 
-    pub fn get_peers(&self) -> Vec<PeerInfo> {
+    pub fn peers(&self) -> Vec<PeerInfo> {
         self.data.peers.read().unwrap().clone()
     }
 }

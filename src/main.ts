@@ -1,7 +1,7 @@
 import type { UseModule } from './types/modules'
 import App from '~/App.vue'
 
-import '@unocss/reset/tailwind.css'
+import '@unocss/reset/tailwind-compat.css'
 import '~/styles/styles.css'
 import 'uno.css'
 
