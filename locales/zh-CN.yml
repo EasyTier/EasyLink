@@ -1,1 +1,15 @@
-hello: 你好 EasyLink
+page:
+  index:
+    networking: 组网
+    tokenPlaceholder: 使用相同简洁令牌进行组网
+    networkNamePlaceholder: 使用相同组名进行组网
+    networkSecretPlaceholder: 设置组密码（可留空）
+    config: 设置
+    delete: 删除
+    cancel: 取消
+    confirmDelete: 确认删除
+    confirmDeleteConfigMessage: 确认删除此配置吗？
+    confirmDeleteConfigMessageTwice: 注意！删除不可恢复。
+    addAndSelectNewNetwork: 新增并选择组网配置
+    noNetworkTitle: 还没有选择组网配置
+    noNetworkDescription: 快快选一个或新增一个吧

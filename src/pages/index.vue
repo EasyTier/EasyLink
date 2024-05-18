@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Network } from '~/types/network'
 
+const { t } = useI18n()
 const networkStore = useNetworkStore()
 const tmpStore = useTmpStore()
 
@@ -32,6 +33,12 @@ function removeThisNetwork(id: string) {
     networkCurrent.value = ''
   }
 }
+
+function addAndSelectNetwork() {
+  addNetwork()
+  if (networkList.value.length)
+    networkCurrent.value = networkList.value[networkList.value.length - 1].config.id
+}
 </script>
 
 <template>
@@ -41,17 +48,17 @@ function removeThisNetwork(id: string) {
         <n-flex :wrap="false">
           <n-input-group>
             <n-input
-              v-if="groupType === 'token'" type="text" placeholder="token" size="medium"
-              :style="{ width: '75%' }"
+              v-if="groupType === 'token'" type="text" :placeholder="t('page.index.tokenPlaceholder')"
+              size="medium" :style="{ width: '75%' }"
             />
             <template v-else>
-              <n-input type="text" placeholder="组名" :style="{ width: '40%' }" />
-              <n-input type="text" placeholder="密码(可为空)" :style="{ width: '35%' }" />
+              <n-input type="text" :placeholder="t('page.index.networkNamePlaceholder')" :style="{ width: '40%' }" />
+              <n-input type="text" :placeholder="t('page.index.networkSecretPlaceholder')" :style="{ width: '35%' }" />
             </template>
             <n-select v-model:value="groupType" :style="{ width: '25%' }" :options="networkGroupType" />
           </n-input-group>
           <n-button type="primary" size="medium">
-            组网
+            {{ t('page.index.networking') }}
           </n-button>
         </n-flex>
       </n-gi>
@@ -61,11 +68,11 @@ function removeThisNetwork(id: string) {
             <template #icon>
               <n-icon i-carbon-settings />
             </template>
-            设置
+            {{ t('page.index.config') }}
           </n-button>
 
           <n-popconfirm
-            negative-text="删除" positive-text="取消"
+            :negative-text="t('page.index.delete')" :positive-text="t('page.index.cancel')"
             @negative-click="removeThisNetwork(currentNetwork.config.id)"
           >
             <template #trigger>
@@ -73,18 +80,21 @@ function removeThisNetwork(id: string) {
                 <template #icon>
                   <n-icon i-carbon-task-remove />
                 </template>
-                移除本配置
+                {{ t('page.index.confirmDeleteConfigMessage') }}
               </n-button>
             </template>
-            注意！删除不可恢复。
+            {{ t('page.index.confirmDeleteConfigMessageTwice') }}
           </n-popconfirm>
         </n-flex>
       </n-gi>
     </n-grid>
-    <n-result v-else status="404" title="还没有组网配置呢" description="快快选一个或新增一个吧">
+    <n-result
+      v-else status="404" :title="t('page.index.noNetworkTitle')"
+      :description="t('page.index.noNetworkDescription')"
+    >
       <template #footer>
-        <n-button @click="addNetwork">
-          新增组网配置
+        <n-button @click="addAndSelectNetwork">
+          {{ t('page.index.addAndSelectNewNetwork') }}
         </n-button>
       </template>
     </n-result>
@@ -96,6 +106,4 @@ function removeThisNetwork(id: string) {
   </n-drawer>
 </template>
 
-<style scoped lang="postcss">
-
-</style>
+<style scoped lang="postcss"></style>

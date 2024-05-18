@@ -1,1 +1,15 @@
-hello: hello EasyLink
+page:
+  index:
+    networking: Networking
+    tokenPlaceholder: Using the same concise token for networking
+    networkNamePlaceholder: Using the same group name for networking
+    networkSecretPlaceholder: Set group password (can be left blank)
+    config: Config
+    delete: Delete
+    cancel: Cancel
+    confirmDelete: Confirm delete
+    confirmDeleteConfigMessage: Are you sure to delete this configuration?
+    confirmDeleteConfigMessageTwice: Attention! Delete irreparable.
+    addAndSelectNewNetwork: Add and select network configuration
+    noNetworkTitle: No network configuration has been selected yet
+    noNetworkDescription: Quickly select one or add another
