@@ -2,8 +2,8 @@ page:
   index:
     networking: Networking
     tokenPlaceholder: Same concise token
-    networkNamePlaceholder: Same group name
-    networkSecretPlaceholder: Group password
+    networkNamePlaceholder: Group name
+    networkSecretPlaceholder: Password
     config: Config
     delete: Delete
     cancel: Cancel
@@ -11,10 +11,12 @@ page:
     confirmDeleteConfigMessage: Delete config
     confirmDeleteConfigMessageTwice: Attention! Delete irreparable.
     addAndSelectNewNetwork: Add and select network configuration
-    noNetworkTitle: No network configuration has been selected yet
+    noNetworkTitle: No network configuration
     noNetworkDescription: Quickly select one or add another
     token: token
     networkGroup: group
+    useTokenOrGroup: Using tokens or group names passwords
+    generateRandToken: Random tokens
 
 component:
   networkConfig:
@@ -44,6 +46,7 @@ layout:
     checkUpdate: Check Update
     about: About
     language: Language
+    winIpBroadcast: Win IP Broadcast
 
 i18n:
   en: English

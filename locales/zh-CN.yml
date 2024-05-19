@@ -15,6 +15,8 @@ page:
     noNetworkDescription: 快快选一个或新增一个吧
     token: 令牌
     networkGroup: 组
+    useTokenOrGroup: 使用简易令牌 / 经典组名及密码
+    generateRandToken: 生成随机简易令牌
 
 component:
   networkConfig:
@@ -44,6 +46,7 @@ layout:
     checkUpdate: 检查更新
     about: 关于
     language: 语言
+    winIpBroadcast: 路由广播
 
 i18n:
   en: English

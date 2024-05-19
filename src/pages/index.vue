@@ -26,6 +26,11 @@ function addAndSelectNetwork() {
   if (networkList.value.length)
     networkCurrent.value = networkList.value[networkList.value.length - 1].config.id
 }
+
+function randomToken() {
+  if (currentNetwork.value)
+    currentNetwork.value.config.token = uuid(6)
+}
 </script>
 
 <template>
@@ -33,15 +38,32 @@ function addAndSelectNetwork() {
     <n-grid v-if="currentNetwork" :x-gap="8" :y-gap="8" :cols="10">
       <n-gi offset="1" span="8">
         <n-flex :wrap="false">
-          <n-input-group>
+          <n-input-group v-if="currentNetwork.otherConfig.token">
             <n-input
-              v-if="currentNetwork.otherConfig.token" type="text" :placeholder="t('page.index.tokenPlaceholder')"
-              size="medium" :style="{ width: '100%' }"
+              v-model:value="currentNetwork.config.token" type="text"
+              :placeholder="t('page.index.tokenPlaceholder')" size="medium" :style="{ width: '100%' }"
             />
-            <template v-else>
-              <n-input type="text" :placeholder="t('page.index.networkNamePlaceholder')" :style="{ width: '55%' }" />
-              <n-input type="text" :placeholder="t('page.index.networkSecretPlaceholder')" :style="{ width: '45%' }" />
-            </template>
+
+            <n-tooltip trigger="hover">
+              <template #trigger>
+                <n-button size="medium" tertiary @click="randomToken">
+                  <template #icon>
+                    <n-icon i-carbon-restart />
+                  </template>
+                </n-button>
+              </template>
+              {{ t('page.index.generateRandToken') }}
+            </n-tooltip>
+          </n-input-group>
+          <n-input-group v-else>
+            <n-input
+              v-model:value="currentNetwork.config.networkName" type="text"
+              :placeholder="t('page.index.networkNamePlaceholder')" :style="{ width: '55%' }"
+            />
+            <n-input
+              v-model:value="currentNetwork.config.networkSecret" type="text"
+              :placeholder="t('page.index.networkSecretPlaceholder')" :style="{ width: '45%' }"
+            />
           </n-input-group>
           <n-button type="primary" size="medium">
             {{ t('page.index.networking') }}
@@ -57,12 +79,17 @@ function addAndSelectNetwork() {
             {{ t('page.index.config') }}
           </n-button>
 
-          <n-checkbox v-model:checked="currentNetwork.otherConfig.token">
-            <template #icon>
-              <n-icon i-carbon-group-security />
+          <n-tooltip trigger="hover">
+            <template #trigger>
+              <n-checkbox v-model:checked="currentNetwork.otherConfig.token">
+                <template #icon>
+                  <n-icon i-carbon-group-security />
+                </template>
+                {{ t('page.index.token') }}
+              </n-checkbox>
             </template>
-            {{ t('page.index.token') }}
-          </n-checkbox>
+            {{ t('page.index.useTokenOrGroup') }}
+          </n-tooltip>
         </n-flex>
       </n-gi>
       <n-gi offset="1" span="6">
@@ -85,7 +112,7 @@ function addAndSelectNetwork() {
       </n-gi>
     </n-grid>
     <n-result
-      v-else status="404" :title="t('page.index.noNetworkTitle')"
+      v-else w-full status="404" :title="t('page.index.noNetworkTitle')"
       :description="t('page.index.noNetworkDescription')"
     >
       <template #footer>
@@ -95,7 +122,7 @@ function addAndSelectNetwork() {
       </template>
     </n-result>
   </n-flex>
-  <n-drawer v-model:show="config" :width="420">
+  <n-drawer v-model:show="config" :width="320">
     <n-drawer-content body-content-class="!p-2">
       <NetworkConfig />
     </n-drawer-content>

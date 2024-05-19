@@ -39,26 +39,26 @@ const menuOptions = computed(() => [
 ])
 
 const platformName = ref('')
-
+const showSider = ref(false)
 onMounted(async () => {
   platformName.value = await platform()
 })
 </script>
 
 <template>
-  <n-layout has-sider h-full>
-    <n-layout-sider bordered content-class="p-2 flex flex-col !overflow-hidden" width="211">
+  <n-layout :has-sider="showSider" h-full>
+    <n-layout-sider v-if="showSider" bordered content-class="p-2 flex flex-col !overflow-hidden" width="211">
       <n-flex h-full>
         <NetworkListAction />
         <NetworkList />
-        <n-flex align="center" justify="space-between" :wrap="false">
-          <n-dropdown trigger="hover" :options="menuOptions" size="small">
-            <n-button strong secondary size="small">
-              <template #icon>
-                <n-icon i-carbon-menu />
-              </template>
-            </n-button>
-          </n-dropdown>
+      </n-flex>
+    </n-layout-sider>
+    <n-layout h-full>
+      <n-layout-header p-2>
+        <n-flex align="center" justify="flex-end" :wrap="false">
+          <n-checkbox v-if="platformName === 'windows'" disabled>
+            {{ t('layout.default.winIpBroadcast') }}
+          </n-checkbox>
           <n-switch v-model:value="isDark">
             <template #checked-icon>
               <n-icon i-carbon-moon />
@@ -67,14 +67,16 @@ onMounted(async () => {
               <n-icon i-carbon-sun />
             </template>
           </n-switch>
-          <n-checkbox v-if="platformName === 'windows'" disabled>
-            路由广播
-          </n-checkbox>
+          <n-dropdown trigger="hover" :options="menuOptions" size="small">
+            <n-button strong secondary size="small">
+              <template #icon>
+                <n-icon i-carbon-menu />
+              </template>
+            </n-button>
+          </n-dropdown>
         </n-flex>
-      </n-flex>
-    </n-layout-sider>
-    <n-layout>
-      <n-layout-content content-class="p-2" h-full>
+      </n-layout-header>
+      <n-layout-content content-class="p-2 h-full" h-full :style="{ 'max-height': 'calc(100vh - 48px)' }">
         <RouterView />
       </n-layout-content>
     </n-layout>
