@@ -2,24 +2,31 @@
 import type { UnlistenFn } from '@tauri-apps/api/event'
 import { listen } from '@tauri-apps/api/event'
 import { darkTheme } from 'naive-ui'
-import type { InstanceEvent } from './types/network'
+import type { InstanceEvent, NetworkInstanceInfo } from './types/network'
 
 const appStore = useAppStore()
+const networkStore = useNetworkStore()
 
 const { isDark } = storeToRefs(appStore)
+const { networkInfo } = storeToRefs(networkStore)
 
 const theme = computed(() => (isDark.value ? darkTheme : null))
 
 const eventListen = ref<UnlistenFn | null>(null)
+const infoListen = ref<UnlistenFn | null>(null)
 onMounted(async () => {
-  eventListen.value = await listen<InstanceEvent>('easytier://event', (event) => {
+  eventListen.value = await listen<InstanceEvent>('easytier://event', () => {
     // console.log(event.payload)
+  })
+  infoListen.value = await listen<NetworkInstanceInfo[]>('network_instance_info', (event) => {
+    networkInfo.value = [...event.payload]
   })
 })
 
 onBeforeUnmount(() => {
   // eventListen.value && eventListen.value()
   eventListen.value?.()
+  infoListen.value?.()
 })
 </script>
 

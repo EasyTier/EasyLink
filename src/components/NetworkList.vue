@@ -3,11 +3,9 @@ import type { Network } from '~/types/network'
 import { NetworkStatus } from '~/types/network'
 
 const networkStore = useNetworkStore()
-const tmpStore = useTmpStore()
 const { t } = useI18n()
 
-const { networkList } = storeToRefs(networkStore)
-const { networkFilter, networkCurrent } = storeToRefs(tmpStore)
+const { networkList, networkFilter, networkCurrentId } = storeToRefs(networkStore)
 
 const filterList = computed<Network[]>(() => {
   return networkList.value.filter((net) => {
@@ -46,10 +44,7 @@ function statusToTagText(status: NetworkStatus) {
 }
 
 function setActive(id: string) {
-  if (networkCurrent.value !== id)
-    networkCurrent.value = id
-  else
-    networkCurrent.value = ''
+  networkCurrentId.value = networkCurrentId.value !== id ? id : ''
 }
 </script>
 
@@ -61,7 +56,7 @@ function setActive(id: string) {
       </n-flex>
       <n-list-item
         v-for="net in filterList" :key="net.config.id"
-        :class="net.config.id === networkCurrent ? 'active' : ''"
+        :class="net.config.id === networkCurrentId ? 'active' : ''"
       >
         <n-dropdown trigger="manual" size="small">
           <n-thing content-class="mt-2" @click="setActive(net.config.id)">

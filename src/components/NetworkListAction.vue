@@ -1,10 +1,9 @@
 <script setup lang="ts">
 const networkStore = useNetworkStore()
-const tmpStore = useTmpStore()
 
 const { addNetwork } = networkStore
 
-const { networkFilter } = storeToRefs(tmpStore)
+const { networkFilter } = storeToRefs(networkStore)
 </script>
 
 <template>
@@ -18,5 +17,4 @@ const { networkFilter } = storeToRefs(tmpStore)
   </n-flex>
 </template>
 
-<style scoped lang="postcss">
-</style>
+<style scoped lang="postcss"></style>

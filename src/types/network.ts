@@ -55,11 +55,12 @@ export interface NetworkOtherConfig {
 }
 
 export interface NetworkInstanceInfo {
+  id: string
   node: NodeInfo
-  events: Record<string, any>
+  events: Record<string, EasytierEvent>
   routes: Route[]
   peers: PeerInfo[]
-  PeerRoutePairs: PeerRoutePair[]
+  peer_route_pairs: PeerRoutePair[]
   running: boolean
   error?: string
 }

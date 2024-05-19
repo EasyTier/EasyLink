@@ -1,4 +1,12 @@
-use std::{collections::BTreeMap, net::Ipv4Addr, sync::Arc};
+use std::{
+    collections::BTreeMap,
+    net::Ipv4Addr,
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc,
+    },
+    time::Duration,
+};
 
 use anyhow::Context;
 use chrono::{DateTime, Local};
@@ -12,7 +20,7 @@ use easytier::{
     utils::{list_peer_route_pair, PeerRoutePair},
 };
 use serde::{Deserialize, Serialize};
-use tauri::AppHandle;
+use tauri::{AppHandle, Manager};
 
 use crate::launcher::{Launcher, NodeInfo};
 
@@ -148,12 +156,13 @@ impl NetworkConfig {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-#[serde(rename_all(deserialize = "camelCase"))]
 pub struct NetworkInstanceInfo {
+    id: String,
     node: NodeInfo,
     events: Vec<(DateTime<Local>, GlobalCtxEvent)>,
     routes: Vec<Route>,
     peers: Vec<PeerInfo>,
+    #[serde(rename(deserialize = "camelCase"))]
     peer_route_pairs: Vec<PeerRoutePair>,
     running: bool,
     error: Option<String>,
@@ -166,10 +175,10 @@ pub struct NetworkInstance {
 }
 
 impl NetworkInstance {
-    fn new(cfg: NetworkConfig, app: AppHandle) -> Result<Self, anyhow::Error> {
+    fn new(cfg: NetworkConfig, app: Arc<AppHandle>) -> Result<Self, anyhow::Error> {
         Ok(Self {
             config: cfg.gen_config()?,
-            app: Arc::new(app),
+            app,
             launcher: None,
         })
     }
@@ -190,6 +199,7 @@ impl NetworkInstance {
         let peer_route_pairs = list_peer_route_pair(peers.clone(), routes.clone());
 
         Some(NetworkInstanceInfo {
+            id: self.config.get_id().to_string().replace('-', ""),
             node: launcher.node(),
             events: launcher.events(),
             routes,
@@ -216,6 +226,9 @@ impl NetworkInstance {
 static INSTANCE_MAP: once_cell::sync::Lazy<DashMap<String, NetworkInstance>> =
     once_cell::sync::Lazy::new(DashMap::new);
 
+static EMIT_INSTANCE_INFO: once_cell::sync::Lazy<AtomicBool> =
+    once_cell::sync::Lazy::new(|| AtomicBool::new(false));
+
 #[tauri::command]
 pub fn parse_network_config(cfg: NetworkConfig) -> Result<String, String> {
     let toml = cfg.gen_config().map_err(|e| e.to_string())?;
@@ -223,14 +236,38 @@ pub fn parse_network_config(cfg: NetworkConfig) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub fn start_network_instance(app: AppHandle, cfg: NetworkConfig) -> Result<(), String> {
+pub async fn start_network_instance(app: AppHandle, cfg: NetworkConfig) -> Result<(), String> {
     if INSTANCE_MAP.contains_key(&cfg.id) {
         return Err("instance already exists".to_string());
     }
     let id = cfg.id.clone();
-    let mut instance = NetworkInstance::new(cfg, app).map_err(|e| e.to_string())?;
+    let app_c = Arc::new(app.clone());
+    let mut instance = NetworkInstance::new(cfg, app_c).map_err(|e| e.to_string())?;
     instance.start().map_err(|e| e.to_string())?;
-    tracing::info!("instance {} started", id);
+
+    if !EMIT_INSTANCE_INFO.load(Ordering::Relaxed) {
+        EMIT_INSTANCE_INFO.store(true, Ordering::Relaxed);
+        tokio::spawn(async move {
+            let mut ret = vec![];
+            loop {
+                for instance in INSTANCE_MAP.iter() {
+                    if let Some(info) = instance.info() {
+                        ret.push(info);
+                    }
+                }
+
+                // if ret.is_empty() {
+                //     EMIT_INSTANCE_INFO.store(false, Ordering::Relaxed);
+                //     break;
+                // }
+
+                let _ = app.emit("network_instance_info", &ret);
+                ret.clear();
+                tokio::time::sleep(Duration::from_secs(1)).await;
+            }
+        });
+    }
+
     INSTANCE_MAP.insert(id, instance);
     Ok(())
 }

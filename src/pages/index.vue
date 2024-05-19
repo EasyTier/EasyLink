@@ -1,30 +1,24 @@
 <script setup lang="ts">
-import type { Network, NetworkConfig } from '~/types/network'
+import type { NetworkConfig } from '~/types/network'
 
 const { t } = useI18n()
 const networkStore = useNetworkStore()
-const tmpStore = useTmpStore()
 
 const { addNetwork, removeNetwork } = networkStore
-const { networkList } = storeToRefs(networkStore)
-const { networkCurrent } = storeToRefs(tmpStore)
+const { networkList, networkCurrentId, currentNetwork } = storeToRefs(networkStore)
 const config = ref(false)
-
-const currentNetwork = computed<Network | undefined>(() => {
-  return networkList.value.find(item => item.config.id === networkCurrent.value)
-})
 
 function removeThisNetwork(id: string) {
   if (id) {
     removeNetwork(id)
-    networkCurrent.value = ''
+    networkCurrentId.value = ''
   }
 }
 
 function addAndSelectNetwork() {
   addNetwork()
   if (networkList.value.length)
-    networkCurrent.value = networkList.value[networkList.value.length - 1].config.id
+    networkCurrentId.value = networkList.value[networkList.value.length - 1].config.id
 }
 
 function randomToken() {
@@ -46,6 +40,11 @@ async function startLink() {
     // link!
     await startNetworkInstance(cfg)
   }
+}
+
+async function stopLink() {
+  if (currentNetwork.value)
+    await stopNetworkInstance(currentNetwork.value.config.id)
 }
 </script>
 
@@ -82,6 +81,9 @@ async function startLink() {
             />
           </n-input-group>
           <n-button type="primary" size="medium" @click="startLink">
+            {{ t('page.index.networking') }}
+          </n-button>
+          <n-button type="error" size="medium" @click="stopLink">
             {{ t('page.index.networking') }}
           </n-button>
         </n-flex>

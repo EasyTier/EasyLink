@@ -1,18 +1,11 @@
 <script setup lang="ts">
 import { hostname } from '@tauri-apps/plugin-os'
-import type { Network, NetworkConfig } from '~/types/network'
 
 const networkStore = useNetworkStore()
-const tmpStore = useTmpStore()
 const { t } = useI18n()
 const { removeNetwork, addNetwork } = networkStore
-const { networkList } = storeToRefs(networkStore)
-const { networkCurrent } = storeToRefs(tmpStore)
+const { networkList, currentNetwork, networkCurrentId } = storeToRefs(networkStore)
 const deviceName = ref('')
-
-const currentNetwork = computed<Network | undefined>(() => {
-  return networkList.value.find(item => item.config.id === networkCurrent.value)
-})
 
 function onlyAllowHostname(value: string) {
   return !value || /^[\u4E00-\u9FA5a-z0-9\-]*$/i.test(value)
@@ -23,7 +16,7 @@ function resetConfig() {
     addNetwork()
     removeNetwork(currentNetwork.value.config.id)
     nextTick(() => {
-      networkCurrent.value = networkList.value[0]?.config.id || ''
+      networkCurrentId.value = networkList.value[0]?.config.id || ''
     })
   }
 }
