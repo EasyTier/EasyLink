@@ -1,5 +1,5 @@
 export const useAppStore = defineStore('appStore', () => {
-  const isDark = useStorage('theme', true)
+  const isDark = useStorage('dark', true)
 
   const toggleDark = () => {
     isDark.value = !isDark.value

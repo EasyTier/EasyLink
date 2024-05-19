@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { hostname } from '@tauri-apps/plugin-os'
-import type { Network } from '~/types/network'
+import type { Network, NetworkConfig } from '~/types/network'
 
 const networkStore = useNetworkStore()
 const tmpStore = useTmpStore()
 const { t } = useI18n()
-
+const { removeNetwork, addNetwork } = networkStore
 const { networkList } = storeToRefs(networkStore)
 const { networkCurrent } = storeToRefs(tmpStore)
 const deviceName = ref('')
@@ -18,6 +18,16 @@ function onlyAllowHostname(value: string) {
   return !value || /^[\u4E00-\u9FA5a-z0-9\-]*$/i.test(value)
 }
 
+function resetConfig() {
+  if (currentNetwork.value) {
+    addNetwork()
+    removeNetwork(currentNetwork.value.config.id)
+    nextTick(() => {
+      networkCurrent.value = networkList.value[0]?.config.id || ''
+    })
+  }
+}
+
 onMounted(async () => {
   deviceName.value = await hostname() || ''
 })
@@ -25,12 +35,25 @@ onMounted(async () => {
 
 <template>
   <n-tabs v-if="currentNetwork" type="line" animated h-full>
+    <template #suffix>
+      <n-popconfirm
+        :negative-text="t('component.networkConfig.reset')"
+        :positive-text="t('component.networkConfig.cancel')" @negative-click="resetConfig"
+      >
+        <template #trigger>
+          <n-button dashed type="error" size="small">
+            {{ t('component.networkConfig.reset') }}
+          </n-button>
+        </template>
+        {{ t('component.networkConfig.confirmResetMessageTwice') }}
+      </n-popconfirm>
+    </template>
     <n-tab-pane name="common" :tab="t('component.networkConfig.commonConfig')">
       <n-scrollbar :style="{ 'max-height': 'calc(100vh - 58px)' }">
         <n-form label-width="auto">
-          <n-form-item :label="t('component.networkConfig.configName')">
+          <n-form-item v-if="false" :label="t('component.networkConfig.configName')">
             <n-input
-              v-model:value="currentNetwork.name"
+              v-model:value="currentNetwork!.name"
               :placeholder="t('component.networkConfig.configNamePlaceholder')"
             />
           </n-form-item>
@@ -57,7 +80,7 @@ onMounted(async () => {
           </n-form-item>
           <n-form-item :label="t('component.networkConfig.peer')">
             <n-select
-              v-model:value="currentNetwork.config.peerUrls" filterable tag
+              v-model:value="currentNetwork.config.peerUrls" filterable tag multiple
               :placeholder="t('component.networkConfig.peerPlaceholder')"
             />
           </n-form-item>
@@ -92,9 +115,7 @@ onMounted(async () => {
   </n-tabs>
   <n-empty v-else :description="t('component.networkConfig.empty')" h-full justify-center>
     <template #extra>
-      <n-button size="small" @click="networkCurrent = ''">
-        {{ t('component.networkConfig.chooseOther') }}
-      </n-button>
+      {{ t('component.networkConfig.chooseOther') }}
     </template>
   </n-empty>
 </template>

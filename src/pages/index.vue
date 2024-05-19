@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Network } from '~/types/network'
+import type { Network, NetworkConfig } from '~/types/network'
 
 const { t } = useI18n()
 const networkStore = useNetworkStore()
@@ -30,6 +30,22 @@ function addAndSelectNetwork() {
 function randomToken() {
   if (currentNetwork.value)
     currentNetwork.value.config.token = uuid(6)
+}
+
+async function startLink() {
+  if (currentNetwork.value) {
+    const cfg: NetworkConfig = JSON.parse(JSON.stringify(currentNetwork.value.config))
+
+    if (currentNetwork.value.otherConfig.token) {
+      delete cfg.networkName
+      delete cfg.networkSecret
+    }
+    else {
+      delete cfg.token
+    }
+    // link!
+    await startNetworkInstance(cfg)
+  }
 }
 </script>
 
@@ -65,7 +81,7 @@ function randomToken() {
               :placeholder="t('page.index.networkSecretPlaceholder')" :style="{ width: '45%' }"
             />
           </n-input-group>
-          <n-button type="primary" size="medium">
+          <n-button type="primary" size="medium" @click="startLink">
             {{ t('page.index.networking') }}
           </n-button>
         </n-flex>
@@ -95,7 +111,7 @@ function randomToken() {
       <n-gi offset="1" span="6">
         <n-flex :wrap="false" align="center">
           <n-popconfirm
-            :negative-text="t('page.index.delete')" :positive-text="t('page.index.cancel')"
+            v-if="false" :negative-text="t('page.index.delete')" :positive-text="t('page.index.cancel')"
             @negative-click="removeThisNetwork(currentNetwork.config.id)"
           >
             <template #trigger>

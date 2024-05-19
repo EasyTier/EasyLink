@@ -1,4 +1,4 @@
-use std::{collections::BTreeMap, net::Ipv4Addr};
+use std::{collections::BTreeMap, net::Ipv4Addr, sync::Arc};
 
 use anyhow::Context;
 use chrono::{DateTime, Local};
@@ -12,6 +12,7 @@ use easytier::{
     utils::{list_peer_route_pair, PeerRoutePair},
 };
 use serde::{Deserialize, Serialize};
+use tauri::AppHandle;
 
 use crate::launcher::{Launcher, NodeInfo};
 
@@ -26,7 +27,7 @@ pub struct NetworkConfig {
     network_name: Option<String>,
     network_secret: Option<String>,
     peer_urls: Vec<String>,
-    proxy_cidrs: Vec<String>,
+    proxy_cidrs: Option<Vec<String>>,
     vpn_portal_port: Option<u32>,
     vpn_portal_addr: Option<String>,
     listener_urls: Vec<String>,
@@ -105,11 +106,13 @@ impl NetworkConfig {
         }
         cfg.set_listeners(listener_urls);
 
-        for n in self.proxy_cidrs.iter() {
-            cfg.add_proxy_cidr(
-                n.parse()
-                    .with_context(|| format!("failed to parse proxy network: {}", n))?,
-            );
+        if let Some(proxy_cidrs) = self.proxy_cidrs.clone() {
+            for n in proxy_cidrs.iter() {
+                cfg.add_proxy_cidr(
+                    n.parse()
+                        .with_context(|| format!("failed to parse proxy network: {}", n))?,
+                );
+            }
         }
 
         cfg.set_rpc_portal(
@@ -158,13 +161,15 @@ pub struct NetworkInstanceInfo {
 
 pub struct NetworkInstance {
     config: TomlConfigLoader,
+    app: Arc<AppHandle>,
     launcher: Option<Launcher>,
 }
 
 impl NetworkInstance {
-    fn new(cfg: NetworkConfig) -> Result<Self, anyhow::Error> {
+    fn new(cfg: NetworkConfig, app: AppHandle) -> Result<Self, anyhow::Error> {
         Ok(Self {
             config: cfg.gen_config()?,
+            app: Arc::new(app),
             launcher: None,
         })
     }
@@ -200,7 +205,7 @@ impl NetworkInstance {
             return Ok(());
         }
 
-        let mut launcher = Launcher::new();
+        let mut launcher = Launcher::new(self.app.clone());
         launcher.start(|| Ok(self.config.clone()));
 
         self.launcher = Some(launcher);
@@ -218,13 +223,12 @@ pub fn parse_network_config(cfg: NetworkConfig) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub fn start_network_instance(cfg: NetworkConfig) -> Result<(), String> {
+pub fn start_network_instance(app: AppHandle, cfg: NetworkConfig) -> Result<(), String> {
     if INSTANCE_MAP.contains_key(&cfg.id) {
         return Err("instance already exists".to_string());
     }
     let id = cfg.id.clone();
-
-    let mut instance = NetworkInstance::new(cfg).map_err(|e| e.to_string())?;
+    let mut instance = NetworkInstance::new(cfg, app).map_err(|e| e.to_string())?;
     instance.start().map_err(|e| e.to_string())?;
     tracing::info!("instance {} started", id);
     INSTANCE_MAP.insert(id, instance);

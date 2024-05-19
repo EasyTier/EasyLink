@@ -1,7 +1,7 @@
 import type { Network } from '~/types/network'
 
 export const useNetworkStore = defineStore('networkStore', () => {
-  const networkList = ref<Network[]>([])
+  const networkList = useStorage<Network[]>('networkList', [])
 
   function addNetwork() {
     const newNetwork: Network = {

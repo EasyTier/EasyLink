@@ -3,7 +3,7 @@ page:
     networking: 组网
     tokenPlaceholder: 使用相同简洁令牌进行组网
     networkNamePlaceholder: 使用相同组名
-    networkSecretPlaceholder: 组密码（可留空
+    networkSecretPlaceholder: 组密码（可空
     config: 设置
     delete: 删除
     cancel: 取消
@@ -37,6 +37,9 @@ component:
     listenerUrl: 监听地址
     empty: 该组网配置不存在
     chooseOther: 选择其他组网配置
+    reset: 重置
+    cancel: 取消
+    confirmResetMessageTwice: 注意！重置不可恢复。
   networkList:
     filterResults: 筛选结果
 

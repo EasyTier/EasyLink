@@ -37,6 +37,9 @@ component:
     listenerUrl: Listener Urls
     empty: The network configuration does not exist
     chooseOther: Look at other things
+    reset: Reset
+    cancel: cancel
+    confirmResetMessageTwice: Attention! Reset is not recoverable.
   networkList:
     filterResults: Filter Results
 

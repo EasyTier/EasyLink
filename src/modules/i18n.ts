@@ -12,6 +12,8 @@ const i18n = createI18n({
   messages: {},
 })
 
+const langStore = useStorage('lang', 'zh-CN')
+
 const localesMap = Object.fromEntries(
   Object.entries(import.meta.glob('../../locales/*.yml'))
     .map(([path, loadLocale]) => [path.match(/([\w-]*)\.yml$/)?.[1], loadLocale]),
@@ -44,8 +46,10 @@ export async function loadLanguageAsync(lang: string): Promise<Locale> {
     messages = await localesMap[lang]()
   }
   catch {
+    lang = 'zh-CN'
     messages = await localesMap['zh-CN']()
   }
+  langStore.value = lang
   i18n.global.setLocaleMessage(lang, messages.default)
   loadedLanguages.push(lang)
   return setI18nLanguage(lang)
@@ -53,5 +57,5 @@ export async function loadLanguageAsync(lang: string): Promise<Locale> {
 
 export const install: UseModule = (app) => {
   app.use(i18n)
-  loadLanguageAsync(localStorage.getItem('lang') || 'zh-CN')
+  loadLanguageAsync(langStore.value)
 }

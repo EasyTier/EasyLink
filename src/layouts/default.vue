@@ -55,25 +55,30 @@ onMounted(async () => {
     </n-layout-sider>
     <n-layout h-full>
       <n-layout-header p-2>
-        <n-flex align="center" justify="flex-end" :wrap="false">
-          <n-checkbox v-if="platformName === 'windows'" disabled>
-            {{ t('layout.default.winIpBroadcast') }}
-          </n-checkbox>
-          <n-switch v-model:value="isDark">
-            <template #checked-icon>
-              <n-icon i-carbon-moon />
-            </template>
-            <template #unchecked-icon>
-              <n-icon i-carbon-sun />
-            </template>
-          </n-switch>
-          <n-dropdown trigger="hover" :options="menuOptions" size="small">
-            <n-button strong secondary size="small">
-              <template #icon>
-                <n-icon i-carbon-menu />
+        <n-flex justify="space-between">
+          <n-flex align="center">
+            <n-badge type="info" dot processing />
+          </n-flex>
+          <n-flex align="center" justify="flex-end" :wrap="false">
+            <n-checkbox v-if="platformName === 'windows'" disabled>
+              {{ t('layout.default.winIpBroadcast') }}
+            </n-checkbox>
+            <n-switch v-model:value="isDark">
+              <template #checked-icon>
+                <n-icon i-carbon-moon />
               </template>
-            </n-button>
-          </n-dropdown>
+              <template #unchecked-icon>
+                <n-icon i-carbon-sun />
+              </template>
+            </n-switch>
+            <n-dropdown trigger="hover" :options="menuOptions" size="small">
+              <n-button strong secondary size="small">
+                <template #icon>
+                  <n-icon i-carbon-menu />
+                </template>
+              </n-button>
+            </n-dropdown>
+          </n-flex>
         </n-flex>
       </n-layout-header>
       <n-layout-content content-class="p-2 h-full" h-full :style="{ 'max-height': 'calc(100vh - 48px)' }">

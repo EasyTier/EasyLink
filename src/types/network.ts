@@ -7,11 +7,11 @@ export interface NetworkConfig {
   networkName?: string
   networkSecret?: string
   peerUrls: string[]
-  proxyCidrs: string[]
+  proxyCidrs?: string[]
   vpnPortalAddr?: string
   vpnPortalPort?: string
   listenerUrls: string[]
-  rpcPort: number
+  rpcPort?: number
 }
 
 export function DEFAULT_NETWORK_CONFIG(): NetworkConfig {
@@ -20,13 +20,11 @@ export function DEFAULT_NETWORK_CONFIG(): NetworkConfig {
     dhcp: true,
     token: uuid(6),
     peerUrls: ['tcp://easytier.public.kkrainbow.top:11010'],
-    proxyCidrs: [],
     listenerUrls: [
       'tcp://0.0.0.0:11010',
       'udp://0.0.0.0:11010',
       'wg://0.0.0.0:11011',
     ],
-    rpcPort: 0,
   }
 }
 
@@ -140,4 +138,27 @@ export interface PeerConnStats {
   rx_packets: number
   tx_packets: number
   latency_us: number
+}
+
+export interface InstanceEvent {
+  id: string
+  time: string
+  event: EasytierEvent
+}
+export interface EasytierEvent {
+  TunDeviceReady?: string
+  PeerAdded?: { PeerId: string }
+  PeerRemoved?: { PeerId: string }
+  PeerConnAdded?: PeerConnInfo
+  PeerConnRemoved?: PeerConnInfo
+  ListenerAdded?: string
+  ListenerAddFailed?: string[]
+  ConnectionAccepted?: string[]
+  ConnectionError?: string[]
+  Connecting?: string
+  ConnectError?: string[]
+  VpnPortalClientConnected?: string[]
+  VpnPortalClientDisconnected?: string[]
+  DhcpIpv4Changed?: string[] // (old, new)
+  DhcpIpv4Conflicted?: string | null
 }

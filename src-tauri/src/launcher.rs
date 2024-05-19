@@ -18,6 +18,7 @@ use easytier::{
     },
 };
 use serde::{Deserialize, Serialize};
+use tauri::AppHandle;
 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NodeInfo {
@@ -26,6 +27,13 @@ pub struct NodeInfo {
     pub stun_info: StunInfo,
     pub listeners: Vec<String>,
     pub vpn_portal_cfg: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Event {
+    pub id: String,
+    pub event: GlobalCtxEvent,
+    pub time: DateTime<Local>,
 }
 
 #[derive(Default, Clone)]
@@ -44,10 +52,12 @@ pub struct Launcher {
 
     error: Arc<RwLock<Option<String>>>,
     data: Data,
+
+    app: Arc<AppHandle>
 }
 
 impl Launcher {
-    pub fn new() -> Self {
+    pub fn new(app: Arc<AppHandle>) -> Self {
         let instance_alive = Arc::new(AtomicBool::new(false));
         Self {
             instance_alive,
@@ -56,12 +66,14 @@ impl Launcher {
             running_cfg: String::new(),
             stop_flag: Arc::new(AtomicBool::new(false)),
             data: Data::default(),
+            app,
         }
     }
 
-    async fn handle_easytier_event(event: GlobalCtxEvent, data: Data) {
+    async fn handle_easytier_event(event: (DateTime<Local>, GlobalCtxEvent), data: Data) {
         let mut events = data.events.write().unwrap();
-        events.push_back((chrono::Local::now(), event));
+        events.push_back(event);
+        
         if events.len() > 100 {
             events.pop_front();
         }
@@ -71,7 +83,9 @@ impl Launcher {
         cfg: TomlConfigLoader,
         stop_signal: Arc<tokio::sync::Notify>,
         data: Data,
+        app: Arc<AppHandle>
     ) -> Result<(), anyhow::Error> {
+        use tauri::Manager;
         let mut instance = Instance::new(cfg);
         let peer_mgr = instance.get_peer_manager();
 
@@ -81,7 +95,14 @@ impl Launcher {
         tokio::spawn(async move {
             let mut receiver = global_ctx.subscribe();
             while let Ok(event) = receiver.recv().await {
-                Self::handle_easytier_event(event, data_c.clone()).await;
+                let now = chrono::Local::now();
+                Self::handle_easytier_event((now, event.clone()), data_c.clone()).await;
+                tracing::info!("event: {:?}", event.clone());
+                                app.emit("easytier://event", Event {
+                    id: global_ctx.get_id().to_string(),
+                    event,
+                    time: now,
+                }).unwrap();
             }
         });
 
@@ -145,6 +166,7 @@ impl Launcher {
         instance_alive.store(true, std::sync::atomic::Ordering::Relaxed);
 
         let data = self.data.clone();
+        let app_c = self.app.clone();
 
         self.thread_handle = Some(std::thread::spawn(move || {
             let rt = tokio::runtime::Builder::new_multi_thread()
@@ -165,6 +187,7 @@ impl Launcher {
                 cfg.unwrap(),
                 stop_notifier.clone(),
                 data,
+                app_c,
             ));
             if let Err(e) = ret {
                 error.write().unwrap().replace(e.to_string());
