@@ -1,5 +1,6 @@
 export const useAppStore = defineStore('appStore', () => {
   const isDark = useStorage('dark', true)
+  const showMultipleNetwork = useStorage('multiple', true)
 
   const toggleDark = () => {
     isDark.value = !isDark.value
@@ -7,6 +8,7 @@ export const useAppStore = defineStore('appStore', () => {
 
   return {
     isDark,
+    showMultipleNetwork,
     toggleDark,
   }
 })
