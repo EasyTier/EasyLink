@@ -29,6 +29,7 @@ page:
     connectNum: 连接数
     countTx: 总上传
     countRx: 总下载
+    event: 事件
 
 component:
   networkConfig:

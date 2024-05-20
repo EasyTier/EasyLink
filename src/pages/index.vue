@@ -9,6 +9,7 @@ const { addNetwork, removeNetwork } = networkStore
 const { networkList, networkCurrentId, currentNetwork, isCurrentNetworkRunning } = storeToRefs(networkStore)
 const configDrawer = ref(false)
 const statusDrawer = ref(false)
+const eventModal = ref(false)
 
 function removeThisNetwork(id: string) {
   if (id) {
@@ -107,6 +108,12 @@ async function stopLink() {
             </template>
             {{ t('page.index.status') }}
           </n-button>
+          <n-button text @click="eventModal = true">
+            <template #icon>
+              <n-icon i-carbon-event-schedule />
+            </template>
+            {{ t('page.index.event') }}
+          </n-button>
 
           <n-tooltip trigger="hover">
             <template #trigger>
@@ -158,6 +165,14 @@ async function stopLink() {
       <NetworkStatus />
     </n-drawer-content>
   </n-drawer>
+  <n-modal v-model:show="eventModal">
+    <n-card
+      w="60%" :title=" t('page.index.event')" :bordered="false" role="dialog"
+      aria-modal="true"
+    >
+      <NetworkEvent />
+    </n-card>
+  </n-modal>
 </template>
 
 <style scoped lang="postcss">
