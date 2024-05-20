@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { UnlistenFn } from '@tauri-apps/api/event'
 import { listen } from '@tauri-apps/api/event'
-import { darkTheme } from 'naive-ui'
+import { darkTheme, dateZhCN, zhCN } from 'naive-ui'
 import type { InstanceEvent, NetworkInstanceInfo } from './types/network'
 
+const { locale } = useI18n()
 const appStore = useAppStore()
 const networkStore = useNetworkStore()
 
@@ -32,7 +33,10 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <n-config-provider :theme>
+  <n-config-provider
+    :theme :locale="locale === 'zh-CN' ? zhCN : undefined"
+    :date-locale="locale === 'zh-CN' ? dateZhCN : undefined"
+  >
     <n-message-provider>
       <n-dialog-provider>
         <n-modal-provider>
