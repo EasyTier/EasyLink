@@ -59,7 +59,7 @@ onMounted(async () => {
         <NetworkList />
       </n-flex>
     </n-layout-sider>
-    <n-layout h-full>
+    <n-layout h-full min-w="475px">
       <n-layout-header p-2>
         <n-flex justify="space-between">
           <NetworkHeadStatus />

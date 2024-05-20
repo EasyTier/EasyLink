@@ -1,6 +1,6 @@
 {
   "productName": "easy-link",
-  "version": "0.0.1",
+  "version": "0.0.1-alpha",
   "identifier": "org.easytier.link.dev",
   "build": {
     "beforeDevCommand": "pnpm dev",
@@ -12,10 +12,10 @@
     "windows": [
       {
         "title": "EasyLink",
-        "width": 750,
-        "height": 420,
+        "width": 685,
+        "height": 320,
         "minHeight": 320,
-        "minWidth": 420
+        "minWidth": 685
       }
     ],
     "security": {

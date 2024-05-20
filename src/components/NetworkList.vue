@@ -50,7 +50,10 @@ function setActive(id: string) {
                   : t('network.status.stopped') }}
               </n-tag>
             </template>
-            <template v-if="networkInfo.find(n => n.id === net.config.id.toLowerCase())" #description>
+            <template
+              v-if="networkInfo.find(n => n.id === net.config.id.toLowerCase())?.node.virtual_ipv4"
+              #description
+            >
               <n-tag type="info" :bordered="false" size="small">
                 {{ `IP: ${networkInfo.find(n => n.id === net.config.id.toLowerCase())?.node.virtual_ipv4}` }}
               </n-tag>

@@ -94,7 +94,7 @@ async function stopLink() {
         </n-flex>
       </n-gi>
       <n-gi offset="1" span="6">
-        <n-flex :wrap="false" align="center">
+        <n-flex align="center">
           <n-button text @click="configDrawer = true">
             <template #icon>
               <n-icon i-carbon-settings />
@@ -125,7 +125,7 @@ async function stopLink() {
             :positive-text="t('page.index.cancel')" @negative-click="removeThisNetwork(currentNetwork.config.id)"
           >
             <template #trigger>
-              <n-button text style="--n-text-color-hover: #e98b8b" ml-4>
+              <n-button text style="--n-text-color-hover: #e98b8b">
                 <template #icon>
                   <n-icon i-carbon-row-delete />
                 </template>
