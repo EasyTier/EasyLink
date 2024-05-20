@@ -5,7 +5,7 @@ const { t } = useI18n()
 const networkStore = useNetworkStore()
 
 const { addNetwork, removeNetwork } = networkStore
-const { networkList, networkCurrentId, currentNetwork } = storeToRefs(networkStore)
+const { networkList, networkCurrentId, currentNetwork, isCurrentNetworkRunning } = storeToRefs(networkStore)
 const config = ref(false)
 
 function removeThisNetwork(id: string) {
@@ -55,13 +55,14 @@ async function stopLink() {
         <n-flex :wrap="false">
           <n-input-group v-if="currentNetwork.otherConfig.token">
             <n-input
-              v-model:value="currentNetwork.config.token" type="text"
+              v-model:value="currentNetwork.config.token" type="text" text-center
               :placeholder="t('page.index.tokenPlaceholder')" size="medium" :style="{ width: '100%' }"
+              :disabled="isCurrentNetworkRunning"
             />
 
             <n-tooltip trigger="hover">
               <template #trigger>
-                <n-button size="medium" tertiary @click="randomToken">
+                <n-button size="medium" tertiary :disabled="isCurrentNetworkRunning" @click="randomToken">
                   <template #icon>
                     <n-icon i-carbon-restart />
                   </template>
@@ -72,19 +73,21 @@ async function stopLink() {
           </n-input-group>
           <n-input-group v-else>
             <n-input
-              v-model:value="currentNetwork.config.networkName" type="text"
-              :placeholder="t('page.index.networkNamePlaceholder')" :style="{ width: '55%' }"
+              v-model:value="currentNetwork.config.networkName" text-center type="text"
+              :disabled="isCurrentNetworkRunning" :placeholder="t('page.index.networkNamePlaceholder')"
+              :style="{ width: '55%' }"
             />
             <n-input
-              v-model:value="currentNetwork.config.networkSecret" type="text"
-              :placeholder="t('page.index.networkSecretPlaceholder')" :style="{ width: '45%' }"
+              v-model:value="currentNetwork.config.networkSecret" text-center type="text"
+              :disabled="isCurrentNetworkRunning" :placeholder="t('page.index.networkSecretPlaceholder')"
+              :style="{ width: '45%' }"
             />
           </n-input-group>
-          <n-button type="primary" size="medium" @click="startLink">
+          <n-button v-if="!isCurrentNetworkRunning" type="primary" size="medium" @click="startLink">
             {{ t('page.index.networking') }}
           </n-button>
-          <n-button type="error" size="medium" @click="stopLink">
-            {{ t('page.index.networking') }}
+          <n-button v-else type="error" size="medium" @click="stopLink">
+            {{ t('page.index.stopNetworking') }}
           </n-button>
         </n-flex>
       </n-gi>
@@ -99,7 +102,7 @@ async function stopLink() {
 
           <n-tooltip trigger="hover">
             <template #trigger>
-              <n-checkbox v-model:checked="currentNetwork.otherConfig.token">
+              <n-checkbox v-model:checked="currentNetwork.otherConfig.token" :disabled="isCurrentNetworkRunning">
                 <template #icon>
                   <n-icon i-carbon-group-security />
                 </template>

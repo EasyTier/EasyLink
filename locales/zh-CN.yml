@@ -1,6 +1,7 @@
 page:
   index:
     networking: 组网
+    stopNetworking: 断开
     tokenPlaceholder: 使用相同简洁令牌进行组网
     networkNamePlaceholder: 使用相同组名
     networkSecretPlaceholder: 组密码（可空

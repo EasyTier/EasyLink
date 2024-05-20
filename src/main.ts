@@ -8,6 +8,6 @@ import 'uno.css'
 const app = createApp(App)
 
 Object.values(import.meta.glob<{ install: UseModule }>('./modules/*.ts', { eager: true }))
-  .forEach(i => i.install?.(app))
+  .forEach(async i => await i.install?.(app))
 
 app.mount('#app')

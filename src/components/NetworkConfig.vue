@@ -4,7 +4,7 @@ import { hostname } from '@tauri-apps/plugin-os'
 const networkStore = useNetworkStore()
 const { t } = useI18n()
 const { removeNetwork, addNetwork } = networkStore
-const { networkList, currentNetwork, networkCurrentId } = storeToRefs(networkStore)
+const { networkList, currentNetwork, networkCurrentId, isCurrentNetworkRunning } = storeToRefs(networkStore)
 const deviceName = ref('')
 
 function onlyAllowHostname(value: string) {
@@ -34,7 +34,7 @@ onMounted(async () => {
         :positive-text="t('component.networkConfig.cancel')" @negative-click="resetConfig"
       >
         <template #trigger>
-          <n-button dashed type="error" size="small">
+          <n-button dashed type="error" size="small" :disabled="isCurrentNetworkRunning">
             {{ t('component.networkConfig.reset') }}
           </n-button>
         </template>
@@ -43,7 +43,7 @@ onMounted(async () => {
     </template>
     <n-tab-pane name="common" :tab="t('component.networkConfig.commonConfig')">
       <n-scrollbar :style="{ 'max-height': 'calc(100vh - 58px)' }">
-        <n-form label-width="auto">
+        <n-form label-width="auto" :disabled="isCurrentNetworkRunning">
           <n-form-item v-if="false" :label="t('component.networkConfig.configName')">
             <n-input
               v-model:value="currentNetwork!.name"
@@ -82,7 +82,7 @@ onMounted(async () => {
     </n-tab-pane>
     <n-tab-pane name="advance" :tab="t('component.networkConfig.advanceConfig')">
       <n-scrollbar :style="{ 'max-height': 'calc(100vh - 58px)' }">
-        <n-form label-width="auto">
+        <n-form label-width="auto" :disabled="isCurrentNetworkRunning">
           <n-form-item :label="t('component.networkConfig.subnetProxy')">
             <n-dynamic-tags />
           </n-form-item>
@@ -90,7 +90,7 @@ onMounted(async () => {
             <n-input-number v-model:value="currentNetwork.config.rpcPort" :min="0" :max="65535" />
           </n-form-item>
           <n-form-item :label="t('component.networkConfig.listenerUrl')">
-            <n-dynamic-input v-model:value="currentNetwork.config.listenerUrls" />
+            <n-dynamic-input v-model:value="currentNetwork.config.listenerUrls" :disabled="isCurrentNetworkRunning" />
           </n-form-item>
           <n-form-item :label="t('component.networkConfig.vpnPortal')">
             <n-input-group>
