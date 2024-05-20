@@ -6,10 +6,8 @@ import NetworkListAction from '~/components/NetworkListAction.vue'
 
 const { locale, t } = useI18n()
 const appStore = useAppStore()
-const networkStore = useNetworkStore()
 
 const { isDark } = storeToRefs(appStore)
-const { isCurrentNetworkRunning } = storeToRefs(networkStore)
 const menuOptions = computed(() => [
   {
     label: t('layout.default.config'),
@@ -59,9 +57,7 @@ onMounted(async () => {
     <n-layout h-full>
       <n-layout-header p-2>
         <n-flex justify="space-between">
-          <n-flex align="center">
-            <n-badge :type="isCurrentNetworkRunning ? 'success' : 'error'" dot processing />
-          </n-flex>
+          <NetworkHeadStatus />
           <n-flex align="center" justify="flex-end" :wrap="false">
             <n-checkbox v-if="platformName === 'windows'" disabled>
               {{ t('layout.default.winIpBroadcast') }}

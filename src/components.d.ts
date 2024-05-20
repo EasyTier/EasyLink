@@ -20,6 +20,7 @@ declare module 'vue' {
     NDynamicTags: typeof import('naive-ui')['NDynamicTags']
     NEmpty: typeof import('naive-ui')['NEmpty']
     NetworkConfig: typeof import('./components/NetworkConfig.vue')['default']
+    NetworkHeadStatus: typeof import('./components/NetworkHeadStatus.vue')['default']
     NetworkList: typeof import('./components/NetworkList.vue')['default']
     NetworkListAction: typeof import('./components/NetworkListAction.vue')['default']
     NFlex: typeof import('naive-ui')['NFlex']

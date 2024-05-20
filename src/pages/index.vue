@@ -5,7 +5,7 @@ const { t } = useI18n()
 const networkStore = useNetworkStore()
 
 const { addNetwork, removeNetwork } = networkStore
-const { networkList, networkCurrentId, currentNetwork, isCurrentNetworkRunning, currentNetworkInfo } = storeToRefs(networkStore)
+const { networkList, networkCurrentId, currentNetwork, isCurrentNetworkRunning, currentNetworkInfoData } = storeToRefs(networkStore)
 const configDrawer = ref(false)
 const statusDrawer = ref(false)
 
@@ -18,27 +18,6 @@ interface DataInfo {
   rx?: number
   lossRate?: number
 }
-
-const data = computed(() => {
-  const dataInfo: DataInfo[] = currentNetworkInfo.value?.peer_route_pairs.map((p) => {
-    const latency = statsCommon(p, 'stats.latency_us')
-    const tx = statsCommon(p, 'stats.tx_bytes')
-    const rx = statsCommon(p, 'stats.rx_bytes')
-    const lossRate = statsCommon(p, 'loss_rate')
-
-    return {
-      name: p.route.hostname,
-      ip: p.route.ipv4_addr,
-      cost: p.route ? p.route.cost : undefined,
-      latency: latency ? latency / 1000 / (p.peer?.conns.length || 1) : undefined,
-      tx,
-      rx,
-      lossRate,
-    }
-  }) || []
-
-  return dataInfo
-})
 
 const columns = computed(() => [
   {
@@ -99,7 +78,7 @@ const columns = computed(() => [
 
 const countTx = computed(() => {
   let tx = 0
-  data.value.forEach((d) => {
+  currentNetworkInfoData.value.forEach((d) => {
     tx += d.tx || 0
   })
   return tx ? humanFileSize(Number(tx)) : ''
@@ -107,7 +86,7 @@ const countTx = computed(() => {
 
 const countRx = computed(() => {
   let rx = 0
-  data.value.forEach((d) => {
+  currentNetworkInfoData.value.forEach((d) => {
     rx += d.rx || 0
   })
   return rx ? humanFileSize(Number(rx)) : ''
@@ -263,11 +242,11 @@ async function stopLink() {
     <n-drawer-content body-content-class="!p-2 !overflow-hidden">
       <n-flex overflow-hidden>
         <n-flex justify="space-around" w-full>
-          <n-statistic :label="t('page.index.connectNum')" :value="data.length" tabular-nums />
+          <n-statistic :label="t('page.index.connectNum')" :value="currentNetworkInfoData.length" tabular-nums />
           <n-statistic :label="t('page.index.countTx')" :value="countTx" tabular-nums />
           <n-statistic :label="t('page.index.countRx')" :value="countRx" tabular-nums />
         </n-flex>
-        <n-data-table :columns="columns" :data="data" :style="{ height: 'calc(80vh - 78px)' }" flex-height />
+        <n-data-table :columns="columns" :data="currentNetworkInfoData" :style="{ height: 'calc(80vh - 78px)' }" flex-height />
       </n-flex>
     </n-drawer-content>
   </n-drawer>

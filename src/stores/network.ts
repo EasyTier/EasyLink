@@ -15,6 +15,25 @@ export const useNetworkStore = defineStore('networkStore', () => {
     return networkInfo.value.find(item => item.id.toLowerCase() === networkCurrentId.value.toLowerCase())
   })
 
+  const currentNetworkInfoData = computed(() => {
+    return currentNetworkInfo.value?.peer_route_pairs.map((p) => {
+      const latency = statsCommon(p, 'stats.latency_us')
+      const tx = statsCommon(p, 'stats.tx_bytes')
+      const rx = statsCommon(p, 'stats.rx_bytes')
+      const lossRate = statsCommon(p, 'loss_rate')
+
+      return {
+        name: p.route.hostname,
+        ip: p.route.ipv4_addr,
+        cost: p.route ? p.route.cost : undefined,
+        latency: latency ? latency / 1000 / (p.peer?.conns.length || 1) : undefined,
+        tx,
+        rx,
+        lossRate,
+      }
+    }) || []
+  })
+
   const isCurrentNetworkRunning = computed<boolean>(() => {
     return !!networkInfo.value.find(i => i.id.toLowerCase() === networkCurrentId.value.toLowerCase())
   })
@@ -58,6 +77,7 @@ export const useNetworkStore = defineStore('networkStore', () => {
     networkCurrentId,
     currentNetwork,
     currentNetworkInfo,
+    currentNetworkInfoData,
     isCurrentNetworkRunning,
     addNetwork,
     removeNetwork,
