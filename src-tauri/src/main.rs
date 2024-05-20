@@ -10,7 +10,7 @@ fn main() {
 
     #[cfg(not(windows))]
     if !check_sudo() {
-        process::exit(0);
+        std::process::exit(0);
     }
 
     tauri::Builder::default()
