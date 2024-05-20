@@ -19,9 +19,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - TARGET: aarch64-unknown-linux-musl
-            OS: ubuntu-22.04
-            GUI_TARGET: aarch64-unknown-linux-gnu
           - TARGET: x86_64-unknown-linux-musl
             OS: ubuntu-22.04
             GUI_TARGET: x86_64-unknown-linux-gnu
