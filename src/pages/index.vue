@@ -2,8 +2,9 @@
 import type { NetworkConfig } from '~/types/network'
 
 const { t } = useI18n()
+const appStore = useAppStore()
 const networkStore = useNetworkStore()
-
+const { showMultipleNetwork } = storeToRefs(appStore)
 const { addNetwork, removeNetwork } = networkStore
 const { networkList, networkCurrentId, currentNetwork, isCurrentNetworkRunning } = storeToRefs(networkStore)
 const configDrawer = ref(false)
@@ -118,16 +119,13 @@ async function stopLink() {
             </template>
             {{ t('page.index.useTokenOrGroup') }}
           </n-tooltip>
-        </n-flex>
-      </n-gi>
-      <n-gi offset="1" span="6">
-        <n-flex :wrap="false" align="center">
+
           <n-popconfirm
-            v-if="false" :negative-text="t('page.index.delete')" :positive-text="t('page.index.cancel')"
-            @negative-click="removeThisNetwork(currentNetwork.config.id)"
+            v-if="showMultipleNetwork" :negative-text="t('page.index.delete')"
+            :positive-text="t('page.index.cancel')" @negative-click="removeThisNetwork(currentNetwork.config.id)"
           >
             <template #trigger>
-              <n-button text>
+              <n-button text style="--n-text-color-hover: #e98b8b" ml-4>
                 <template #icon>
                   <n-icon i-carbon-row-delete />
                 </template>

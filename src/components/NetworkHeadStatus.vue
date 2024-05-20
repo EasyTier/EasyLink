@@ -23,7 +23,7 @@ const countRx = computed(() => {
 <template>
   <n-flex align="center">
     <n-badge :type="isCurrentNetworkRunning ? 'success' : 'error'" dot processing ml-2 />
-    <n-tag v-if="currentNetworkInfo?.running && currentNetworkInfo.node.virtual_ipv4" type="success" :bordered="false">
+    <n-tag v-if="currentNetworkInfo?.running && currentNetworkInfo.node.virtual_ipv4" type="info" :bordered="false" size="small">
       {{ `IP: ${currentNetworkInfo.node.virtual_ipv4}` }}
     </n-tag>
     <n-tag v-if="currentNetworkInfo?.running && countTx && countRx" :bordered="false">

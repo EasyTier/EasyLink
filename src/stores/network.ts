@@ -50,6 +50,7 @@ export const useNetworkStore = defineStore('networkStore', () => {
 
   function addNetwork() {
     const newNetwork: Network = {
+      name: `EasyLink-${uuid(3)}`,
       config: DEFAULT_NETWORK_CONFIG(),
       status: NetworkStatus.OFF,
       otherConfig: DEFAULT_NETWORK_OTHER_CONFIG(),

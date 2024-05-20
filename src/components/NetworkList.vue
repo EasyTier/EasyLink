@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import type { Network } from '~/types/network'
-import { NetworkStatus } from '~/types/network'
 
 const networkStore = useNetworkStore()
 const { t } = useI18n()
 
-const { networkList, networkFilter, networkCurrentId } = storeToRefs(networkStore)
+const { networkList, networkFilter, networkCurrentId, networkInfo } = storeToRefs(networkStore)
 
 const filterList = computed<Network[]>(() => {
   return networkList.value.filter((net) => {
@@ -15,33 +14,10 @@ const filterList = computed<Network[]>(() => {
   })
 })
 
-function statusToTagType(status: NetworkStatus) {
-  switch (status) {
-    case NetworkStatus.RUNNING:
-      return 'success'
-    case NetworkStatus.STARTING:
-      return 'info'
-    case NetworkStatus.ERROR:
-      return 'error'
-    default:
-      return 'default'
-  }
-}
-
-function statusToTagText(status: NetworkStatus) {
-  switch (status) {
-    case NetworkStatus.RUNNING:
-      return t('network.status.running')
-    case NetworkStatus.STARTING:
-      return t('network.status.starting')
-    case NetworkStatus.ERROR:
-      return t('network.status.error')
-    case NetworkStatus.OFF:
-      return t('network.status.off')
-    case NetworkStatus.STOPPED:
-      return t('network.status.stopped')
-  }
-}
+const runningArray = computed(() => {
+  const ids = networkInfo.value.map(n => n.id)
+  return networkList.value.filter(n => ids.includes(n.config.id.toLowerCase())).map(n => n.config.id.toLowerCase()) || []
+})
 
 function setActive(id: string) {
   networkCurrentId.value = networkCurrentId.value !== id ? id : ''
@@ -66,8 +42,17 @@ function setActive(id: string) {
               </n-performant-ellipsis>
             </template>
             <template #header-extra>
-              <n-tag :bordered="false" size="small" :type="statusToTagType(net.status)" select-none>
-                {{ statusToTagText(net.status) }}
+              <n-tag
+                :bordered="false" size="small" :type="runningArray.includes(net.config.id.toLowerCase()) ? 'success'
+                  : 'default'" select-none
+              >
+                {{ runningArray.includes(net.config.id.toLowerCase()) ? t('network.status.running')
+                  : t('network.status.stopped') }}
+              </n-tag>
+            </template>
+            <template v-if="networkInfo.find(n => n.id === net.config.id.toLowerCase())" #description>
+              <n-tag type="info" :bordered="false" size="small">
+                {{ `IP: ${networkInfo.find(n => n.id === net.config.id.toLowerCase())?.node.virtual_ipv4}` }}
               </n-tag>
             </template>
           </n-thing>

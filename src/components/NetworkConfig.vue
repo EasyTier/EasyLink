@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { hostname } from '@tauri-apps/plugin-os'
 
+const appStore = useAppStore()
 const networkStore = useNetworkStore()
 const { t } = useI18n()
+const { showMultipleNetwork } = storeToRefs(appStore)
 const { removeNetwork, addNetwork } = networkStore
 const { networkList, currentNetwork, networkCurrentId, isCurrentNetworkRunning } = storeToRefs(networkStore)
 const deviceName = ref('')
@@ -16,7 +18,7 @@ function resetConfig() {
     addNetwork()
     removeNetwork(currentNetwork.value.config.id)
     nextTick(() => {
-      networkCurrentId.value = networkList.value[0]?.config.id || ''
+      networkCurrentId.value = networkList.value[networkList.value.length - 1]?.config.id || ''
     })
   }
 }
@@ -44,7 +46,7 @@ onMounted(async () => {
     <n-tab-pane name="common" :tab="t('component.networkConfig.commonConfig')">
       <n-scrollbar :style="{ 'max-height': 'calc(100vh - 58px)' }">
         <n-form label-width="auto" :disabled="isCurrentNetworkRunning">
-          <n-form-item v-if="false" :label="t('component.networkConfig.configName')">
+          <n-form-item v-show="showMultipleNetwork" :label="t('component.networkConfig.configName')">
             <n-input
               v-model:value="currentNetwork!.name"
               :placeholder="t('component.networkConfig.configNamePlaceholder')"

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { platform } from '@tauri-apps/plugin-os'
+import { arch, platform } from '@tauri-apps/plugin-os'
 import { availableLocales, loadLanguageAsync } from '~/modules/i18n'
 import NetworkList from '~/components/NetworkList.vue'
 import NetworkListAction from '~/components/NetworkListAction.vue'
@@ -7,7 +7,7 @@ import NetworkListAction from '~/components/NetworkListAction.vue'
 const { locale, t } = useI18n()
 const appStore = useAppStore()
 
-const { isDark } = storeToRefs(appStore)
+const { isDark, showMultipleNetwork } = storeToRefs(appStore)
 const menuOptions = computed(() => [
   {
     label: t('layout.default.config'),
@@ -39,16 +39,21 @@ const menuOptions = computed(() => [
 ])
 
 const platformName = ref('')
-const showSider = ref(false)
+const archName = ref('')
 
 onMounted(async () => {
   platformName.value = await platform()
+  archName.value = await arch()
 })
 </script>
 
 <template>
-  <n-layout :has-sider="showSider" h-full>
-    <n-layout-sider v-if="showSider" bordered content-class="p-2 flex flex-col !overflow-hidden" width="211">
+  <n-layout has-sider h-full>
+    <n-layout-sider
+      bordered content-class="p-2 flex flex-col !overflow-hidden" width="211" collapse-mode="transform"
+      show-trigger="bar" :collapsed-width="0" :on-after-enter="() => showMultipleNetwork = true"
+      :on-after-leave="() => showMultipleNetwork = false" :default-collapsed="!showMultipleNetwork"
+    >
       <n-flex h-full>
         <NetworkListAction />
         <NetworkList />
@@ -59,7 +64,7 @@ onMounted(async () => {
         <n-flex justify="space-between">
           <NetworkHeadStatus />
           <n-flex align="center" justify="flex-end" :wrap="false">
-            <n-checkbox v-if="platformName === 'windows'" disabled>
+            <n-checkbox v-if="platformName === 'windows' && archName === 'x86_64'" disabled>
               {{ t('layout.default.winIpBroadcast') }}
             </n-checkbox>
             <n-switch v-model:value="isDark">
@@ -86,3 +91,7 @@ onMounted(async () => {
     </n-layout>
   </n-layout>
 </template>
+
+<style scoped lang="postcss">
+
+</style>
