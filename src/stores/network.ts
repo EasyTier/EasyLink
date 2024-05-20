@@ -1,5 +1,15 @@
 import type { Network, NetworkInstanceInfo } from '~/types/network'
 
+interface DataInfo {
+  name: string
+  ip: string
+  cost?: number
+  latency?: number
+  tx?: number
+  rx?: number
+  lossRate?: number
+}
+
 export const useNetworkStore = defineStore('networkStore', () => {
   const networkList = useStorage<Network[]>('networkList', [])
   const networkInfo = ref<NetworkInstanceInfo[]>([])
@@ -15,7 +25,7 @@ export const useNetworkStore = defineStore('networkStore', () => {
     return networkInfo.value.find(item => item.id.toLowerCase() === networkCurrentId.value.toLowerCase())
   })
 
-  const currentNetworkInfoData = computed(() => {
+  const currentNetworkInfoData = computed<DataInfo[]>(() => {
     return currentNetworkInfo.value?.peer_route_pairs.map((p) => {
       const latency = statsCommon(p, 'stats.latency_us')
       const tx = statsCommon(p, 'stats.tx_bytes')
