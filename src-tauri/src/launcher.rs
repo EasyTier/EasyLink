@@ -98,7 +98,7 @@ impl Launcher {
                 let now = chrono::Local::now();
                 Self::handle_easytier_event((now, event.clone()), data_c.clone()).await;
                 tracing::info!("event: {:?}", event.clone());
-                                app.emit("easytier://event", Event {
+                app.emit("easytier://event", Event {
                     id: global_ctx.get_id().to_string(),
                     event,
                     time: now,

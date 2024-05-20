@@ -29,7 +29,7 @@ page:
     connectNum: Connections
     countTx: Total upload
     countRx: Total download
-
+    event: event
 component:
   networkConfig:
     commonConfig: Common

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import hljs from 'highlight.js'
 import type { UnlistenFn } from '@tauri-apps/api/event'
 import { listen } from '@tauri-apps/api/event'
 import { darkTheme, dateZhCN, zhCN } from 'naive-ui'
@@ -9,7 +10,7 @@ const appStore = useAppStore()
 const networkStore = useNetworkStore()
 
 const { isDark } = storeToRefs(appStore)
-const { networkInfo } = storeToRefs(networkStore)
+const { networkInfo, networkList } = storeToRefs(networkStore)
 
 const theme = computed(() => (isDark.value ? darkTheme : null))
 
@@ -22,6 +23,12 @@ onMounted(async () => {
   infoListen.value = await listen<NetworkInstanceInfo[]>('network_instance_info', (event) => {
     // console.log(event.payload)
     networkInfo.value = [...event.payload]
+    networkList.value.forEach((n) => {
+      const p = event.payload.find(i => i.id === n.config.id.toLowerCase())
+
+      if (p)
+        n.detail = p
+    })
   })
 })
 
@@ -35,7 +42,7 @@ onBeforeUnmount(() => {
 <template>
   <n-config-provider
     :theme :locale="locale === 'zh-CN' ? zhCN : undefined"
-    :date-locale="locale === 'zh-CN' ? dateZhCN : undefined"
+    :date-locale="locale === 'zh-CN' ? dateZhCN : undefined" :hljs="hljs"
   >
     <n-message-provider>
       <n-dialog-provider>

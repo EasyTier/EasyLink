@@ -16,6 +16,7 @@
     "@tauri-apps/plugin-os": "2.0.0-beta.3",
     "@tauri-apps/plugin-shell": ">=2.0.0-beta.4",
     "@vueuse/core": "^10.9.0",
+    "highlight.js": "^11.9.0",
     "pinia": "^2.1.7",
     "vue": "^3.4.27",
     "vue-i18n": "^9.13.1",
