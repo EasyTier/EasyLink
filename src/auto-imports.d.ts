@@ -46,6 +46,7 @@ declare global {
   const getCurrentScope: typeof import('vue')['getCurrentScope']
   const getOsHostname: typeof import('./composables/network')['getOsHostname']
   const h: typeof import('vue')['h']
+  const humanFileSize: typeof import('./composables/networkInfo')['humanFileSize']
   const ignorableWatch: typeof import('@vueuse/core')['ignorableWatch']
   const inject: typeof import('vue')['inject']
   const injectLocal: typeof import('@vueuse/core')['injectLocal']
@@ -112,6 +113,7 @@ declare global {
   const shallowReadonly: typeof import('vue')['shallowReadonly']
   const shallowRef: typeof import('vue')['shallowRef']
   const startNetworkInstance: typeof import('./composables/network')['startNetworkInstance']
+  const statsCommon: typeof import('./composables/networkInfo')['statsCommon']
   const stopNetworkInstance: typeof import('./composables/network')['stopNetworkInstance']
   const storeToRefs: typeof import('pinia')['storeToRefs']
   const syncRef: typeof import('@vueuse/core')['syncRef']
@@ -374,6 +376,7 @@ declare module 'vue' {
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
+    readonly humanFileSize: UnwrapRef<typeof import('./composables/networkInfo')['humanFileSize']>
     readonly ignorableWatch: UnwrapRef<typeof import('@vueuse/core')['ignorableWatch']>
     readonly inject: UnwrapRef<typeof import('vue')['inject']>
     readonly injectLocal: UnwrapRef<typeof import('@vueuse/core')['injectLocal']>
@@ -436,6 +439,7 @@ declare module 'vue' {
     readonly shallowReadonly: UnwrapRef<typeof import('vue')['shallowReadonly']>
     readonly shallowRef: UnwrapRef<typeof import('vue')['shallowRef']>
     readonly startNetworkInstance: UnwrapRef<typeof import('./composables/network')['startNetworkInstance']>
+    readonly statsCommon: UnwrapRef<typeof import('./composables/networkInfo')['statsCommon']>
     readonly stopNetworkInstance: UnwrapRef<typeof import('./composables/network')['stopNetworkInstance']>
     readonly storeToRefs: UnwrapRef<typeof import('pinia')['storeToRefs']>
     readonly syncRef: UnwrapRef<typeof import('@vueuse/core')['syncRef']>
@@ -689,6 +693,7 @@ declare module '@vue/runtime-core' {
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
+    readonly humanFileSize: UnwrapRef<typeof import('./composables/networkInfo')['humanFileSize']>
     readonly ignorableWatch: UnwrapRef<typeof import('@vueuse/core')['ignorableWatch']>
     readonly inject: UnwrapRef<typeof import('vue')['inject']>
     readonly injectLocal: UnwrapRef<typeof import('@vueuse/core')['injectLocal']>
@@ -751,6 +756,7 @@ declare module '@vue/runtime-core' {
     readonly shallowReadonly: UnwrapRef<typeof import('vue')['shallowReadonly']>
     readonly shallowRef: UnwrapRef<typeof import('vue')['shallowRef']>
     readonly startNetworkInstance: UnwrapRef<typeof import('./composables/network')['startNetworkInstance']>
+    readonly statsCommon: UnwrapRef<typeof import('./composables/networkInfo')['statsCommon']>
     readonly stopNetworkInstance: UnwrapRef<typeof import('./composables/network')['stopNetworkInstance']>
     readonly storeToRefs: UnwrapRef<typeof import('pinia')['storeToRefs']>
     readonly syncRef: UnwrapRef<typeof import('@vueuse/core')['syncRef']>

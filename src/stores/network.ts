@@ -11,6 +11,10 @@ export const useNetworkStore = defineStore('networkStore', () => {
     return networkList.value.find(item => item.config.id === networkCurrentId.value)
   })
 
+  const currentNetworkInfo = computed<NetworkInstanceInfo | undefined>(() => {
+    return networkInfo.value.find(item => item.id.toLowerCase() === networkCurrentId.value.toLowerCase())
+  })
+
   const isCurrentNetworkRunning = computed<boolean>(() => {
     return !!networkInfo.value.find(i => i.id.toLowerCase() === networkCurrentId.value.toLowerCase())
   })
@@ -53,6 +57,7 @@ export const useNetworkStore = defineStore('networkStore', () => {
     networkFilter,
     networkCurrentId,
     currentNetwork,
+    currentNetworkInfo,
     isCurrentNetworkRunning,
     addNetwork,
     removeNetwork,

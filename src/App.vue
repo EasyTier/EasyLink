@@ -19,6 +19,7 @@ onMounted(async () => {
     // console.log(event.payload)
   })
   infoListen.value = await listen<NetworkInstanceInfo[]>('network_instance_info', (event) => {
+    // console.log(event.payload)
     networkInfo.value = [...event.payload]
   })
 })
