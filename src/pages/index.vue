@@ -7,7 +7,7 @@ const networkStore = useNetworkStore()
 const { addNetwork, removeNetwork } = networkStore
 const { networkList, networkCurrentId, currentNetwork, isCurrentNetworkRunning, currentNetworkInfo } = storeToRefs(networkStore)
 const configDrawer = ref(false)
-const statusDrawer = ref(true)
+const statusDrawer = ref(false)
 
 interface DataInfo {
   name: string
