@@ -54,7 +54,12 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Install rust target
-        run: bash ./.github/workflows/install_rust.sh
+        run: bash ./.github/workflows/install_rust.
+      
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
 
       - name: Setup protoc
         uses: arduino/setup-protoc@v2
