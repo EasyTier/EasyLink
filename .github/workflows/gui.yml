@@ -54,7 +54,7 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Install rust target
-        run: bash ./.github/workflows/install_rust.
+        run: bash ./.github/workflows/install_rust.sh
       
       - name: Rust cache
         uses: swatinem/rust-cache@v2
