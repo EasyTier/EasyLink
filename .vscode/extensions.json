@@ -4,6 +4,9 @@
     "rust-lang.rust-analyzer",
     "dbaeumer.vscode-eslint",
     "antfu.unocss",
-    "lokalise.i18n-ally"
+    "lokalise.i18n-ally",
+    "cpylua.language-postcss",
+    "csstools.postcss",
+    "vunguyentuan.vscode-postcss"
   ]
 }

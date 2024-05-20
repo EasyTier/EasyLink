@@ -18,6 +18,7 @@ use easytier::{
     },
 };
 use serde::{Deserialize, Serialize};
+use tauri::AppHandle;
 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NodeInfo {
@@ -28,8 +29,15 @@ pub struct NodeInfo {
     pub vpn_portal_cfg: Option<String>,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Event {
+    pub id: String,
+    pub event: GlobalCtxEvent,
+    pub time: DateTime<Local>,
+}
+
 #[derive(Default, Clone)]
-struct Data {
+pub struct Data {
     events: Arc<RwLock<VecDeque<(DateTime<Local>, GlobalCtxEvent)>>>,
     node: Arc<RwLock<NodeInfo>>,
     routes: Arc<RwLock<Vec<Route>>>,
@@ -42,26 +50,30 @@ pub struct Launcher {
     thread_handle: Option<std::thread::JoinHandle<()>>,
     running_cfg: String,
 
-    error_msg: Arc<RwLock<Option<String>>>,
+    error: Arc<RwLock<Option<String>>>,
     data: Data,
+
+    app: Arc<AppHandle>
 }
 
 impl Launcher {
-    pub fn new() -> Self {
+    pub fn new(app: Arc<AppHandle>) -> Self {
         let instance_alive = Arc::new(AtomicBool::new(false));
         Self {
             instance_alive,
             thread_handle: None,
-            error_msg: Arc::new(RwLock::new(None)),
+            error: Arc::new(RwLock::new(None)),
             running_cfg: String::new(),
             stop_flag: Arc::new(AtomicBool::new(false)),
             data: Data::default(),
+            app,
         }
     }
 
-    async fn handle_easytier_event(event: GlobalCtxEvent, data: Data) {
+    async fn handle_easytier_event(event: (DateTime<Local>, GlobalCtxEvent), data: Data) {
         let mut events = data.events.write().unwrap();
-        events.push_back((chrono::Local::now(), event));
+        events.push_back(event);
+        
         if events.len() > 100 {
             events.pop_front();
         }
@@ -71,7 +83,9 @@ impl Launcher {
         cfg: TomlConfigLoader,
         stop_signal: Arc<tokio::sync::Notify>,
         data: Data,
+        app: Arc<AppHandle>
     ) -> Result<(), anyhow::Error> {
+        use tauri::Manager;
         let mut instance = Instance::new(cfg);
         let peer_mgr = instance.get_peer_manager();
 
@@ -81,7 +95,14 @@ impl Launcher {
         tokio::spawn(async move {
             let mut receiver = global_ctx.subscribe();
             while let Ok(event) = receiver.recv().await {
-                Self::handle_easytier_event(event, data_c.clone()).await;
+                let now = chrono::Local::now();
+                Self::handle_easytier_event((now, event.clone()), data_c.clone()).await;
+                tracing::info!("event: {:?}", event.clone());
+                                app.emit("easytier://event", Event {
+                    id: global_ctx.get_id().to_string(),
+                    event,
+                    time: now,
+                }).unwrap();
             }
         });
 
@@ -130,10 +151,10 @@ impl Launcher {
     where
         F: FnOnce() -> Result<TomlConfigLoader, anyhow::Error> + Send + Sync,
     {
-        let error_msg = self.error_msg.clone();
+        let error = self.error.clone();
         let cfg = cfg_generator();
         if let Err(e) = cfg {
-            error_msg.write().unwrap().replace(e.to_string());
+            error.write().unwrap().replace(e.to_string());
             return;
         }
 
@@ -145,6 +166,7 @@ impl Launcher {
         instance_alive.store(true, std::sync::atomic::Ordering::Relaxed);
 
         let data = self.data.clone();
+        let app_c = self.app.clone();
 
         self.thread_handle = Some(std::thread::spawn(move || {
             let rt = tokio::runtime::Builder::new_multi_thread()
@@ -165,16 +187,17 @@ impl Launcher {
                 cfg.unwrap(),
                 stop_notifier.clone(),
                 data,
+                app_c,
             ));
             if let Err(e) = ret {
-                error_msg.write().unwrap().replace(e.to_string());
+                error.write().unwrap().replace(e.to_string());
             }
             instance_alive.store(false, std::sync::atomic::Ordering::Relaxed);
         }));
     }
 
-    pub fn error_msg(&self) -> Option<String> {
-        self.error_msg.read().unwrap().clone()
+    pub fn error(&self) -> Option<String> {
+        self.error.read().unwrap().clone()
     }
 
     pub fn running(&self) -> bool {
@@ -182,20 +205,20 @@ impl Launcher {
             .load(std::sync::atomic::Ordering::Relaxed)
     }
 
-    pub fn get_events(&self) -> Vec<(DateTime<Local>, GlobalCtxEvent)> {
+    pub fn events(&self) -> Vec<(DateTime<Local>, GlobalCtxEvent)> {
         let events = self.data.events.read().unwrap();
         events.iter().cloned().collect()
     }
 
-    pub fn get_node(&self) -> NodeInfo {
+    pub fn node(&self) -> NodeInfo {
         self.data.node.read().unwrap().clone()
     }
 
-    pub fn get_routes(&self) -> Vec<Route> {
+    pub fn routes(&self) -> Vec<Route> {
         self.data.routes.read().unwrap().clone()
     }
 
-    pub fn get_peers(&self) -> Vec<PeerInfo> {
+    pub fn peers(&self) -> Vec<PeerInfo> {
         self.data.peers.read().unwrap().clone()
     }
 }

@@ -1,1 +1,76 @@
-hello: 你好 EasyLink
+page:
+  index:
+    networking: 组网
+    stopNetworking: 断开
+    tokenPlaceholder: 使用相同简洁令牌进行组网
+    networkNamePlaceholder: 使用相同组名
+    networkSecretPlaceholder: 组密码（可空
+    config: 设置
+    status: 状态
+    delete: 删除
+    cancel: 取消
+    confirmDelete: 确认删除
+    confirmDeleteConfigMessage: 删除该配置
+    confirmDeleteConfigMessageTwice: 注意！删除不可恢复。
+    addAndSelectNewNetwork: 新增并选择组网配置
+    noNetworkTitle: 还没有选择组网配置
+    noNetworkDescription: 快快选一个或新增一个吧
+    token: 令牌
+    networkGroup: 组
+    useTokenOrGroup: 使用简易令牌 / 经典组名及密码
+    generateRandToken: 生成随机简易令牌
+    name: 主机名称
+    ip: 虚拟IP
+    networkType: 类型
+    latency: 延迟
+    tx: 上传
+    rx: 下载
+    lossRate: 丢包率
+    connectNum: 连接数
+    countTx: 总上传
+    countRx: 总下载
+
+component:
+  networkConfig:
+    commonConfig: 常规设置
+    advanceConfig: 高级设置
+    configName: 组网配置名称
+    configNamePlaceholder: 用于区分组网配置
+    deviceName: 本机名称
+    deviceNamePlaceholder: 留空默认为：{0}
+    virtualIP: 虚拟ip
+    virtualIPPlaceholder: 组网环境内虚拟ip
+    dhcp: DHCP
+    peer: 组网节点
+    peerPlaceholder: 组网节点ip
+    vpnPortal: VPN Portal
+    subnetProxy: 子网代理
+    rpcPortal: RPC 端口
+    listenerUrl: 监听地址
+    empty: 该组网配置不存在
+    chooseOther: 选择其他组网配置
+    reset: 重置
+    cancel: 取消
+    confirmResetMessageTwice: 注意！重置不可恢复。
+  networkList:
+    filterResults: 筛选结果
+
+layout:
+  default:
+    config: 设置
+    checkUpdate: 检查更新
+    about: 关于
+    language: 语言
+    winIpBroadcast: 路由广播
+
+i18n:
+  en: English
+  zh-CN: 简体中文
+
+network:
+  status:
+    running: 运行中
+    starting: 启动中
+    error: 发生错误
+    off: 未启动
+    stopped: 已停止

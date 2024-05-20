@@ -1,0 +1,8 @@
+{
+  "bundle": {
+    "resources": [
+      "./Packet.dll",
+      "./wintun.dll"
+    ]
+  }
+}
