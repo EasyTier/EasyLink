@@ -7,7 +7,7 @@ use crate::invoke::*;
 
 fn main() {
     tracing_subscriber::fmt::init();
-    
+
     #[cfg(not(windows))]
     if !check_sudo() {
         process::exit(0);
@@ -31,7 +31,7 @@ fn main() {
 fn check_sudo() -> bool {
     let is_elevated = privilege::user::privileged();
     if !is_elevated {
-        let Ok(exe) = current_exe() else {
+        let Ok(exe) = std::env::current_exe() else {
             return true;
         };
         let mut elevated_cmd = privilege::runas::Command::new(exe);
