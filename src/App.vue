@@ -3,13 +3,14 @@ import hljs from 'highlight.js'
 import type { UnlistenFn } from '@tauri-apps/api/event'
 import { listen } from '@tauri-apps/api/event'
 import { darkTheme, dateZhCN, zhCN } from 'naive-ui'
-import type { InstanceEvent, NetworkInstanceInfo } from './types/network'
+import type { InstanceEvent, Network, NetworkInstanceInfo } from './types/network'
 
 const { locale } = useI18n()
 const appStore = useAppStore()
 const networkStore = useNetworkStore()
 
 const { isDark } = storeToRefs(appStore)
+const { pushInfoStack } = networkStore
 const { networkInfo, networkList } = storeToRefs(networkStore)
 
 const theme = computed(() => (isDark.value ? darkTheme : null))
@@ -23,11 +24,13 @@ onMounted(async () => {
   infoListen.value = await listen<NetworkInstanceInfo[]>('network_instance_info', (event) => {
     // console.log(event.payload)
     networkInfo.value = [...event.payload]
-    networkList.value.forEach((n) => {
+    networkList.value.forEach((n: Network) => {
       const p = event.payload.find(i => i.id === n.config.id.toLowerCase())
 
-      if (p)
+      if (p) {
         n.detail = p
+        pushInfoStack(n.config.id, p)
+      }
     })
   })
 })
@@ -37,7 +40,6 @@ onBeforeUnmount(() => {
   eventListen.value?.()
   infoListen.value?.()
 })
-
 </script>
 
 <template>

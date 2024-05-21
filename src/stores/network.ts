@@ -9,7 +9,7 @@ interface DataInfo {
   rx?: number
   lossRate?: number
 }
-
+const MAX_STACK = 120
 export const useNetworkStore = defineStore('networkStore', () => {
   const networkList = useStorage<Network[]>('networkList', [])
   const networkInfo = ref<NetworkInstanceInfo[]>([])
@@ -47,6 +47,42 @@ export const useNetworkStore = defineStore('networkStore', () => {
   const isCurrentNetworkRunning = computed<boolean>(() => {
     return !!networkInfo.value.find(i => i.id.toLowerCase() === networkCurrentId.value.toLowerCase())
   })
+
+  const networkInfoDataStack = reactive<Record<string, { time: string, data: DataInfo[] }[]>>({})
+
+  const currentNetworkInfoDataStack = computed<{ time: string, data: DataInfo[] }[]>(() => {
+    return networkInfoDataStack[networkCurrentId.value] || []
+  })
+
+  function pushInfoStack(id: string, info: NetworkInstanceInfo) {
+    const now = new Date()
+    const nowTime = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
+    if (!networkInfoDataStack[id])
+      networkInfoDataStack[id] = []
+
+    networkInfoDataStack[id].push({
+      time: nowTime,
+      data: info.peer_route_pairs.map((p) => {
+        const latency = statsCommon(p, 'stats.latency_us')
+        const tx = statsCommon(p, 'stats.tx_bytes')
+        const rx = statsCommon(p, 'stats.rx_bytes')
+        const lossRate = statsCommon(p, 'loss_rate')
+
+        return {
+          name: p.route.hostname,
+          ip: p.route.ipv4_addr,
+          cost: p.route ? p.route.cost : undefined,
+          latency: latency ? latency / 1000 / (p.peer?.conns.length || 1) : undefined,
+          tx,
+          rx,
+          lossRate,
+        }
+      }) || [],
+    })
+
+    if (networkInfoDataStack[id].length > MAX_STACK)
+      networkInfoDataStack[id].shift()
+  }
 
   function addNetwork() {
     const newNetwork: Network = {
@@ -86,14 +122,17 @@ export const useNetworkStore = defineStore('networkStore', () => {
     networkInfo,
     networkFilter,
     networkCurrentId,
+    networkInfoDataStack,
     currentNetwork,
     currentNetworkInfo,
     currentNetworkInfoData,
     isCurrentNetworkRunning,
+    currentNetworkInfoDataStack,
     addNetwork,
     removeNetwork,
     startNetwork,
     stopNetwork,
+    pushInfoStack,
   }
 })
 
