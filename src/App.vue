@@ -37,6 +37,7 @@ onBeforeUnmount(() => {
   eventListen.value?.()
   infoListen.value?.()
 })
+
 </script>
 
 <template>

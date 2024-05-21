@@ -105,7 +105,7 @@ async function stopLink() {
           </n-button>
         </n-flex>
       </n-gi>
-      <n-gi offset="1" span="6">
+      <n-gi offset="1" span="8">
         <n-flex align="center">
           <n-button text @click="configDrawer = true">
             <template #icon>
@@ -154,6 +154,11 @@ async function stopLink() {
           </n-popconfirm>
         </n-flex>
       </n-gi>
+      <n-gi offset="1" span="8">
+        <n-flex align="center">
+          <NetworkStatusChart :stack="30" />
+        </n-flex>
+      </n-gi>
     </n-grid>
     <n-result
       v-else w-full status="404" :title="t('page.index.noNetworkTitle')"
@@ -177,10 +182,7 @@ async function stopLink() {
     </n-drawer-content>
   </n-drawer>
   <n-modal v-model:show="eventModal">
-    <n-card
-      w="60%" :title=" t('page.index.event')" :bordered="false" role="dialog"
-      aria-modal="true"
-    >
+    <n-card w="60%" :title=" t('page.index.event')" :bordered="false" role="dialog" aria-modal="true">
       <NetworkEvent />
     </n-card>
   </n-modal>

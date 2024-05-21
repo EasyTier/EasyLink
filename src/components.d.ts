@@ -27,6 +27,7 @@ declare module 'vue' {
     NetworkList: typeof import('./components/NetworkList.vue')['default']
     NetworkListAction: typeof import('./components/NetworkListAction.vue')['default']
     NetworkStatus: typeof import('./components/NetworkStatus.vue')['default']
+    NetworkStatusChart: typeof import('./components/NetworkStatusChart.vue')['default']
     NFlex: typeof import('naive-ui')['NFlex']
     NForm: typeof import('naive-ui')['NForm']
     NFormItem: typeof import('naive-ui')['NFormItem']
