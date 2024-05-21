@@ -2,6 +2,7 @@
 import type { NetworkConfig } from '~/types/network'
 
 const { t } = useI18n()
+const message = useMessage()
 const appStore = useAppStore()
 const networkStore = useNetworkStore()
 const { showMultipleNetwork } = storeToRefs(appStore)
@@ -41,7 +42,17 @@ async function startLink() {
       delete cfg.token
     }
     // link!
-    await startNetworkInstance(cfg)
+
+    try {
+      await parseNetworkConfig(cfg)
+      await startNetworkInstance(cfg)
+    }
+    catch (e: any) {
+      message.error(e, {
+        closable: true,
+        duration: 10000,
+      })
+    }
   }
 }
 
