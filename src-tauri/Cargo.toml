@@ -1,6 +1,6 @@
 [package]
 name = "easylink"
-version = "0.0.1"
+version = "0.1.0-beta"
 description = "Easy to link"
 authors = ["m1m1sha"]
 edition = "2021"
