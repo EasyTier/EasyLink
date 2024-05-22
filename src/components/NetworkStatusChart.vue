@@ -22,7 +22,7 @@ const networkStore = useNetworkStore()
 const appStore = useAppStore()
 
 const { isDark } = storeToRefs(appStore)
-const { isCurrentNetworkRunning, currentNetworkInfoDataStack, networkCurrentId, networkInfoDataStack } = storeToRefs(networkStore)
+const { isCurrentNetworkRunning, currentNetworkInfoDataStack, networkCurrentId } = storeToRefs(networkStore)
 
 const xAxisData = ref<string[]>([])
 const rxLineData = ref<(number | null)[]>([])
@@ -110,6 +110,12 @@ function updateChartData() {
         }, 0)
       }))
     }
+  }
+
+  if (xAxisData.value.length > stack.value) {
+    xAxisData.value.shift()
+    rxLineData.value.shift()
+    txLineData.value.shift()
   }
 }
 
