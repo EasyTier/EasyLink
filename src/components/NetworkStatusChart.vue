@@ -22,7 +22,7 @@ const networkStore = useNetworkStore()
 const appStore = useAppStore()
 
 const { isDark } = storeToRefs(appStore)
-const { isCurrentNetworkRunning, currentNetworkInfoDataStack, networkCurrentId } = storeToRefs(networkStore)
+const { isCurrentNetworkRunning, currentNetworkInfoDataStack, networkCurrentId, networkInfoDataStack } = storeToRefs(networkStore)
 
 const xAxisData = ref<string[]>([])
 const rxLineData = ref<(number | null)[]>([])
@@ -120,9 +120,9 @@ watch(networkCurrentId, () => {
   updateChartData()
 })
 
-watch(currentNetworkInfoDataStack.value, () => {
+watch(currentNetworkInfoDataStack, () => {
   updateChartData()
-})
+}, { immediate: true, deep: true })
 </script>
 
 <template>
