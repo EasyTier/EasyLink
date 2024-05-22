@@ -247,8 +247,10 @@ pub async fn start_network_instance(app: AppHandle, cfg: NetworkConfig) -> Resul
 
     if !EMIT_INSTANCE_INFO.load(Ordering::Relaxed) {
         EMIT_INSTANCE_INFO.store(true, Ordering::Relaxed);
+        tracing::info!("instance info emit started");
         tokio::spawn(async move {
             let mut ret = vec![];
+            let mut flag = 0;
             loop {
                 for instance in INSTANCE_MAP.iter() {
                     if let Some(info) = instance.info() {
@@ -256,10 +258,16 @@ pub async fn start_network_instance(app: AppHandle, cfg: NetworkConfig) -> Resul
                     }
                 }
 
-                // if ret.is_empty() {
-                //     EMIT_INSTANCE_INFO.store(false, Ordering::Relaxed);
-                //     break;
-                // }
+                if ret.is_empty() {
+                    flag += 1;
+                    if flag > 5 {
+                        EMIT_INSTANCE_INFO.store(false, Ordering::Relaxed);
+                        tracing::info!("instance info emit stopped");
+                        break;
+                    }
+                } else {
+                    flag = 0;
+                }
 
                 let _ = app.emit("network_instance_info", &ret);
                 ret.clear();

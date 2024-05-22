@@ -1,4 +1,4 @@
-import type { PeerRoutePair } from '~/types/network'
+import type { DataInfo, PeerRoutePair } from '~/types/network'
 
 export function humanFileSize(bytes: number, si = true, dp = 1) {
   const thresh = si ? 1000 : 1024
@@ -33,4 +33,23 @@ export function statsCommon(info: PeerRoutePair, field: string): number | undefi
 function resolveObjPath(path: string, obj = globalThis, separator = '.') {
   const properties = Array.isArray(path) ? path : path.split(separator)
   return properties.reduce((prev, curr) => prev?.[curr], obj)
+}
+
+export function peerRoutePairToStatusData(prp: PeerRoutePair[]): DataInfo[] {
+  return prp.map((p) => {
+    const latency = statsCommon(p, 'stats.latency_us')
+    const tx = statsCommon(p, 'stats.tx_bytes')
+    const rx = statsCommon(p, 'stats.rx_bytes')
+    const lossRate = statsCommon(p, 'loss_rate')
+
+    return {
+      name: p.route.hostname,
+      ip: p.route.ipv4_addr,
+      cost: p.route ? p.route.cost : undefined,
+      latency: latency ? latency / 1000 / (p.peer?.conns.length || 1) : undefined,
+      tx,
+      rx,
+      lossRate,
+    }
+  }) || []
 }

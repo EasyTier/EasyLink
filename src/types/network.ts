@@ -54,6 +54,23 @@ export interface NetworkOtherConfig {
   token: boolean
 }
 
+export interface DataInfo {
+  name: string
+  ip: string
+  cost?: number
+  latency?: number
+  tx?: number
+  rx?: number
+  lossRate?: number
+}
+
+export interface NetworkInfoStack {
+  time: string
+  id: string
+  node: NodeInfo
+  peerRoutePair: PeerRoutePair[]
+}
+
 export interface NetworkInstanceInfo {
   id: string
   node: NodeInfo

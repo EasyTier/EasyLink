@@ -1,107 +1,86 @@
 <script setup lang="ts">
+import { hostname } from '@tauri-apps/plugin-os'
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
-import { LineChart } from 'echarts/charts'
-import { GridComponent, LegendComponent, TooltipComponent } from 'echarts/components'
+import { BarChart, GraphChart, LineChart } from 'echarts/charts'
+import type {
+  AxisPointerComponentOption,
+  GridComponentOption,
+  LegendComponentOption,
+  TooltipComponentOption,
+} from 'echarts/components'
+import {
+  GridComponent,
+  LegendComponent,
+  TooltipComponent,
+} from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
 import type { ComposeOption } from 'echarts/core'
-import type { LineSeriesOption } from 'echarts/charts'
-import type { GridComponentOption } from 'echarts/components'
+import type { BarSeriesOption, GraphSeriesOption, LineSeriesOption } from 'echarts/charts'
 
 const props = defineProps<{
   stack?: number
 }>()
 
+use([GridComponent, TooltipComponent, LegendComponent, GraphChart, LineChart, BarChart, CanvasRenderer])
+
+type BaseEChartsOption = ComposeOption<
+  | TooltipComponentOption
+  | LegendComponentOption
+  | GridComponentOption
+  | LineSeriesOption
+  | BarSeriesOption
+  | AxisPointerComponentOption
+>
+
+type TopologyEChartsOption = ComposeOption<
+  | LegendComponentOption
+  | TooltipComponentOption
+  | GraphSeriesOption
+>
+
+const deviceName = ref('')
 const stack = computed(() => props.stack || 30)
-
-use([GridComponent, TooltipComponent, LegendComponent, LineChart, CanvasRenderer])
-
-type EChartsOption = ComposeOption<GridComponentOption | LineSeriesOption>
 
 const networkStore = useNetworkStore()
 const appStore = useAppStore()
 
 const { isDark } = storeToRefs(appStore)
-const { isCurrentNetworkRunning, currentNetworkInfoDataStack } = storeToRefs(networkStore)
+const { currentNetworkInfoDataStack, networkCurrentId, currentNetworkInfo, currentNetwork } = storeToRefs(networkStore)
 
-const xAxisData = computed<string[]>(() => {
-  return currentNetworkInfoDataStack.value.slice(-stack.value).map(d => d.time)
+const xAxisData = ref<(string | null)[]>([])
+const rxLineData = ref<(number | null)[]>([])
+const txLineData = ref<(number | null)[]>([])
+const peerSumLineData = ref<(number | null)[]>([])
+
+const graphData = ref<{
+  nodes: { id: string, name: string, value: string, symbolSize?: number }[]
+  links: { source: string, target: string }[]
+  categories?: { name: string }[]
+}>({
+  nodes: [],
+  links: [],
 })
-const seriesData = computed<LineSeriesOption[]>(() => {
-  const rxa: number[] = []
-  const txa: number[] = []
 
-  const needStack = currentNetworkInfoDataStack.value.slice(-stack.value)
-  needStack.forEach((s) => {
-    let rx = 0; let tx = 0
-
-    s.data.forEach((d) => {
-      rx += d.rx || 0
-      tx += d.tx || 0
-    })
-    rxa.push(rx)
-    txa.push(tx)
-  })
-  return [
-    {
-      name: 'rx',
-      type: 'line',
-      stack: 'Total',
-      smooth: true,
-      data: [...rxa],
-    },
-    {
-      name: 'tx',
-      type: 'line',
-      stack: 'Total',
-      smooth: true,
-      data: [...txa],
-    },
-  ]
+const last = ref<{
+  nodes: string[]
+  ip: string | null
+  ipIsEmpty: number
+}>({
+  nodes: [],
+  ip: null,
+  ipIsEmpty: 0,
 })
-// const need = ['rx', 'tx']
-// watch(currentNetworkInfoData, (n) => {
-//   const now = new Date()
-//   const nowTime = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
-//   xAxisData.value.push(nowTime)
 
-//   need.forEach((k) => {
-//     let tmp = 0
-//     n.forEach((d) => {
-//       // @ts-expect-error key
-//       tmp += d[k] || 0
-//     })
-
-//     const i = seriesData.value.findIndex(d => d.name === k)
-//     if (i >= 0) {
-//       seriesData.value[i].data!.push(tmp)
-//       if (seriesData.value[i].data!.length > stack.value)
-//         seriesData.value[i].data!.shift()
-//     }
-//     else {
-//       const nullArr: any[] = Array.from({ length: xAxisData.value.length }).fill(null)
-//       seriesData.value.push({
-//         name: k,
-//         type: 'line',
-//         stack: 'Total',
-//         smooth: true,
-//         data: [...nullArr, tmp],
-//       })
-//     }
-//   })
-
-//   if (xAxisData.value.length > stack.value)
-//     xAxisData.value.shift()
-// })
-
-const option = computed<EChartsOption>(() => {
+const baseOption = computed<BaseEChartsOption>(() => {
   return {
     backgroundColor: '',
     tooltip: {
       trigger: 'axis',
-      formatter: (params: any) => {
-        return `${params[0].seriesName}: ${humanFileSize(Number(params[0].data)) || '0 B'}/s<br /> ${params[1].seriesName}: ${humanFileSize(Number(params[1].data)) || '0 B'}/s`
-      },
+      // formatter: (params: any) => {
+      //   console.log(params)
+      //   return `${params[0].seriesName}: ${humanFileSize(Number(params[0].data)) || '0 B'}/s<br /> ${params[1].seriesName}: ${humanFileSize(Number(params[1].data)) || '0 B'}/s<br /> ${params[2].seriesName}: ${params[2].data}`
+      // },
     },
     legend: {},
     grid: {
@@ -115,22 +94,206 @@ const option = computed<EChartsOption>(() => {
       boundaryGap: false,
       data: xAxisData.value,
     },
-    yAxis: {
-      type: 'value',
-      axisLabel: {
-        formatter: (data) => {
-          return humanFileSize(Number(data)) || '0 B'
+    yAxis: [
+      {
+        type: 'value',
+        name: 'traffic',
+        axisLabel: {
+          alignTicks: true,
+          show: true,
+          formatter: (data) => {
+            return humanFileSize(Number(data)) || '0 B'
+          },
         },
       },
-    },
-    series: seriesData.value,
+      {
+        type: 'log',
+        logBase: 5,
+        min: 0,
+        max: 255,
+        interval: [1, 50, 150, 250],
+        name: 'peers',
+        position: 'right',
+        axisLine: {
+          show: true,
+        },
+      },
+    ],
+    series: [
+      {
+        name: 'rx',
+        type: 'line',
+        stack: 'Total',
+        smooth: true,
+        data: rxLineData.value,
+      },
+      {
+        name: 'tx',
+        type: 'line',
+        stack: 'Total',
+        smooth: true,
+        data: txLineData.value,
+      },
+      // {
+      //   name: 'device',
+      //   type: 'bar',
+      //   link: {
+      //     yAxisIndex: 1,
+      //   },
+      //   smooth: true,
+      //   data: peerSumLineData.value,
+      // },
+    ],
   }
 })
+
+const topologyOption = computed<TopologyEChartsOption>(() => {
+  return {
+    backgroundColor: '',
+    legend: {},
+    tooltip: {},
+    animationDuration: 1500,
+    animationEasingUpdate: 'quinticInOut',
+    series: [
+      {
+        type: 'graph',
+        layout: 'force',
+        legendHoverLink: false,
+        data: graphData.value.nodes,
+        edges: graphData.value.links,
+        categories: graphData.value.categories,
+        roam: true,
+        force: {
+          repulsion: 300,
+        },
+        label: {
+          position: 'inside',
+          formatter: '{b} - {c}',
+        },
+        lineStyle: {
+          color: 'source',
+          curveness: 0.3,
+        },
+        emphasis: {
+          focus: 'adjacency',
+          lineStyle: {
+            width: 5,
+          },
+        },
+      },
+    ],
+  }
+})
+
+onMounted(async () => {
+  deviceName.value = await hostname() || ''
+})
+
+function updateBaseChartData() {
+  let needStack = currentNetworkInfoDataStack.value.slice(-stack.value)
+
+  const xAxisTemp: (string | null)[] = []
+  const rxLineDataTemp: (number | null)[] = []
+  const txLineDataTemp: (number | null)[] = []
+  const peerSumLineDataTemp: (number | null)[] = []
+
+  if (xAxisData.value.length > 0) {
+    const lastTimeIndex = needStack.findIndex(d => d.time === xAxisData.value[xAxisData.value.length - 1])
+    needStack = (lastTimeIndex !== -1 && lastTimeIndex < needStack.length - 1) ? needStack.slice((needStack.length - 1 - lastTimeIndex) * -1) : []
+  }
+
+  needStack.forEach((s) => {
+    xAxisTemp.push(s.time)
+    const prp = peerRoutePairToStatusData(s.peerRoutePair)
+    rxLineDataTemp.push(prp.reduce((sum, d) => {
+      return sum += d.rx || 0
+    }, 0))
+    txLineDataTemp.push(prp.reduce((sum, d) => {
+      return sum += d.tx || 0
+    }, 0))
+    peerSumLineDataTemp.push(s.peerRoutePair.length)
+  })
+
+  xAxisData.value.push(...xAxisTemp)
+  rxLineData.value.push(...rxLineDataTemp)
+  txLineData.value.push(...txLineDataTemp)
+  peerSumLineData.value.push(...peerSumLineDataTemp)
+
+  if (xAxisData.value.length > stack.value) {
+    xAxisData.value.shift()
+    rxLineData.value.shift()
+    txLineData.value.shift()
+    peerSumLineData.value.shift()
+  }
+}
+
+function updateTopologyChartData() {
+  if (currentNetworkInfo.value) {
+    const routeNodes = currentNetworkInfo.value.routes.map(d => d.peer_id.toString())
+    const ip = currentNetworkInfo.value.node.virtual_ipv4
+    if (JSON.stringify(last.value.nodes.sort()) !== JSON.stringify(routeNodes.sort()) && last.value.ip !== ip && last.value.ipIsEmpty < 10) {
+      const nodesTemp: { id: string, name: string, value: string, symbolSize?: number }[] = []
+      const linksTemp: { source: string, target: string }[] = []
+      // const categoryTemp: (string | null)[] = []
+      nodesTemp.push({
+        // id: c.peer_id.toString(),
+        id: ip,
+        name: currentNetwork.value?.config.deviceName || deviceName.value,
+        symbolSize: 45,
+        value: ip,
+      })
+      currentNetworkInfo.value.routes.forEach((c) => {
+        nodesTemp.push({
+          // id: c.peer_id.toString(),
+          id: c.ipv4_addr,
+          name: c.hostname,
+          symbolSize: 30,
+          value: c.ipv4_addr,
+        })
+
+        if (ip) {
+          linksTemp.push({
+            source: ip,
+            target: c.ipv4_addr,
+          })
+        }
+      })
+      graphData.value.nodes = nodesTemp
+      graphData.value.links = linksTemp
+      last.value.ip = ip
+      last.value.nodes = routeNodes
+
+      if (last.value.ip === '')
+        last.value.ipIsEmpty += 1
+    }
+  }
+}
+
+watch(networkCurrentId, () => {
+  xAxisData.value = []
+  rxLineData.value = []
+  txLineData.value = []
+  graphData.value = { nodes: [], links: [] }
+  updateBaseChartData()
+  updateTopologyChartData()
+})
+
+watch(currentNetworkInfoDataStack, () => {
+  updateBaseChartData()
+  updateTopologyChartData()
+}, { immediate: true, deep: true })
 </script>
 
 <template>
-  <n-flex v-if="isCurrentNetworkRunning" w-full>
-    <VChart :theme="isDark ? 'dark' : undefined" class="chart" autoresize :option="option" />
+  <n-flex w-full>
+    <n-tabs v-if="currentNetworkInfoDataStack" type="line" animated>
+      <n-tab-pane name="base" tab="base">
+        <VChart :theme="isDark ? 'dark' : undefined" class="chart" autoresize :option="baseOption" />
+      </n-tab-pane>
+      <n-tab-pane name="topology" tab="topology">
+        <VChart :theme="isDark ? 'dark' : undefined" class="chart" autoresize :option="topologyOption" />
+      </n-tab-pane>
+    </n-tabs>
   </n-flex>
 </template>
 

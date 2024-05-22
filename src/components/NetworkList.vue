@@ -26,7 +26,7 @@ function setActive(id: string) {
 
 <template>
   <n-scrollbar :style="{ 'max-height': 'calc(100vh - 55px)' }">
-    <n-list hoverable clickable>
+    <n-list clickable hoverable>
       <n-flex v-if="networkFilter" justify="center" align="center" mb-2>
         {{ `${t('component.networkList.filterResults')}: ${filterList.length} / ${networkList.length}` }}
       </n-flex>
