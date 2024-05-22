@@ -1,4 +1,4 @@
-import type { Network, NetworkInstanceInfo } from '~/types/network'
+import type { Network, NetworkConfig, NetworkInstanceInfo } from '~/types/network'
 
 interface DataInfo {
   name: string
@@ -98,23 +98,38 @@ export const useNetworkStore = defineStore('networkStore', () => {
     networkList.value = networkList.value.filter(network => network.config.id !== id)
   }
 
-  async function startNetwork(id: string) {
-    const net = networkList.value.find(network => network.config.id === id)
-    if (!net)
-      return
-
-    net.status = NetworkStatus.STARTING
-
-    // TODO: start network
+  async function startNetwork(callback: (e: any) => void, id: string | undefined = undefined) {
+    const network = id ? networkList.value.find(network => network.config.id === id) : currentNetwork.value
+    if (network) {
+      const cfg: NetworkConfig = JSON.parse(JSON.stringify(network.config))
+      if (network.otherConfig.token) {
+        delete cfg.networkName
+        delete cfg.networkSecret
+      }
+      else {
+        delete cfg.token
+      }
+      // link!
+      try {
+        await parseNetworkConfig(cfg)
+        await startNetworkInstance(cfg)
+      }
+      catch (e: any) {
+        callback(e)
+      }
+    }
   }
 
-  async function stopNetwork(id: string) {
-    const net = networkList.value.find(network => network.config.id === id)
-    if (!net)
-      return
-    // TODO:
-
-    net.status = NetworkStatus.STOPPED
+  async function stopNetwork(callback: (e: any) => void = () => { }, id: string | undefined = undefined) {
+    const network = id ? networkList.value.find(network => network.config.id === id) : currentNetwork.value
+    if (network) {
+      try {
+        await stopNetworkInstance(network.config.id)
+      }
+      catch (e: any) {
+        callback(e)
+      }
+    }
   }
 
   return {

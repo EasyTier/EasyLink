@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import type { NetworkConfig } from '~/types/network'
-
 const { t } = useI18n()
 const message = useMessage()
 const appStore = useAppStore()
 const networkStore = useNetworkStore()
 const { showMultipleNetwork } = storeToRefs(appStore)
-const { addNetwork, removeNetwork } = networkStore
+const { addNetwork, removeNetwork, startNetwork, stopNetwork } = networkStore
 const { networkList, networkCurrentId, currentNetwork, isCurrentNetworkRunning } = storeToRefs(networkStore)
 const configDrawer = ref(false)
 const statusDrawer = ref(false)
@@ -31,34 +29,16 @@ function randomToken() {
 }
 
 async function startLink() {
-  if (currentNetwork.value) {
-    const cfg: NetworkConfig = JSON.parse(JSON.stringify(currentNetwork.value.config))
-
-    if (currentNetwork.value.otherConfig.token) {
-      delete cfg.networkName
-      delete cfg.networkSecret
-    }
-    else {
-      delete cfg.token
-    }
-    // link!
-
-    try {
-      await parseNetworkConfig(cfg)
-      await startNetworkInstance(cfg)
-    }
-    catch (e: any) {
-      message.error(e, {
-        closable: true,
-        duration: 10000,
-      })
-    }
-  }
+  await startNetwork((e) => {
+    message.error(e, {
+      closable: true,
+      duration: 10000,
+    })
+  })
 }
 
 async function stopLink() {
-  if (currentNetwork.value)
-    await stopNetworkInstance(currentNetwork.value.config.id)
+  await stopNetwork()
 }
 </script>
 
