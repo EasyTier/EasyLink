@@ -22,77 +22,11 @@ const networkStore = useNetworkStore()
 const appStore = useAppStore()
 
 const { isDark } = storeToRefs(appStore)
-const { isCurrentNetworkRunning, currentNetworkInfoDataStack } = storeToRefs(networkStore)
+const { isCurrentNetworkRunning, currentNetworkInfoDataStack, networkCurrentId } = storeToRefs(networkStore)
 
-const xAxisData = computed<string[]>(() => {
-  return currentNetworkInfoDataStack.value.slice(-stack.value).map(d => d.time)
-})
-const seriesData = computed<LineSeriesOption[]>(() => {
-  const rxa: number[] = []
-  const txa: number[] = []
-
-  const needStack = currentNetworkInfoDataStack.value.slice(-stack.value)
-  needStack.forEach((s) => {
-    let rx = 0; let tx = 0
-
-    s.data.forEach((d) => {
-      rx += d.rx || 0
-      tx += d.tx || 0
-    })
-    rxa.push(rx)
-    txa.push(tx)
-  })
-  return [
-    {
-      name: 'rx',
-      type: 'line',
-      stack: 'Total',
-      smooth: true,
-      data: [...rxa],
-    },
-    {
-      name: 'tx',
-      type: 'line',
-      stack: 'Total',
-      smooth: true,
-      data: [...txa],
-    },
-  ]
-})
-// const need = ['rx', 'tx']
-// watch(currentNetworkInfoData, (n) => {
-//   const now = new Date()
-//   const nowTime = `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
-//   xAxisData.value.push(nowTime)
-
-//   need.forEach((k) => {
-//     let tmp = 0
-//     n.forEach((d) => {
-//       // @ts-expect-error key
-//       tmp += d[k] || 0
-//     })
-
-//     const i = seriesData.value.findIndex(d => d.name === k)
-//     if (i >= 0) {
-//       seriesData.value[i].data!.push(tmp)
-//       if (seriesData.value[i].data!.length > stack.value)
-//         seriesData.value[i].data!.shift()
-//     }
-//     else {
-//       const nullArr: any[] = Array.from({ length: xAxisData.value.length }).fill(null)
-//       seriesData.value.push({
-//         name: k,
-//         type: 'line',
-//         stack: 'Total',
-//         smooth: true,
-//         data: [...nullArr, tmp],
-//       })
-//     }
-//   })
-
-//   if (xAxisData.value.length > stack.value)
-//     xAxisData.value.shift()
-// })
+const xAxisData = ref<string[]>([])
+const rxLineData = ref<(number | null)[]>([])
+const txLineData = ref<(number | null)[]>([])
 
 const option = computed<EChartsOption>(() => {
   return {
@@ -123,8 +57,71 @@ const option = computed<EChartsOption>(() => {
         },
       },
     },
-    series: seriesData.value,
+    series: [
+      {
+        name: 'rx',
+        type: 'line',
+        stack: 'Total',
+        smooth: true,
+        data: rxLineData.value,
+      },
+      {
+        name: 'tx',
+        type: 'line',
+        stack: 'Total',
+        smooth: true,
+        data: txLineData.value,
+      },
+    ],
   }
+})
+
+function updateChartData() {
+  const needStack = currentNetworkInfoDataStack.value.slice(-stack.value)
+
+  if (xAxisData.value.length === 0) {
+    xAxisData.value = currentNetworkInfoDataStack.value.slice(-stack.value).map(d => d.time)
+    rxLineData.value = needStack.map((s) => {
+      return s.data.reduce((sum, d) => {
+        return sum += d.rx || 0
+      }, 0)
+    })
+    txLineData.value = needStack.map((s) => {
+      return s.data.reduce((sum, d) => {
+        return sum += d.tx || 0
+      }, 0)
+    })
+  }
+  else {
+    const lastTime = xAxisData.value[xAxisData.value.length - 1]
+
+    const lastTimeIndex = needStack.findIndex(d => d.time === lastTime)
+
+    if (lastTimeIndex !== -1 && lastTimeIndex < needStack.length - 1) {
+      xAxisData.value.push(...needStack.slice((needStack.length - 1 - lastTimeIndex) * -1).map(d => d.time))
+      rxLineData.value.push(...needStack.slice((needStack.length - 1 - lastTimeIndex) * -1).map((s) => {
+        return s.data.reduce((sum, d) => {
+          return sum += d.rx || 0
+        }, 0)
+      }))
+      txLineData.value.push(...needStack.slice((needStack.length - 1 - lastTimeIndex) * -1).map((s) => {
+        return s.data.reduce((sum, d) => {
+          return sum += d.tx || 0
+        }, 0)
+      }))
+    }
+  }
+}
+
+watch(networkCurrentId, () => {
+  xAxisData.value = []
+  rxLineData.value = []
+  txLineData.value = []
+  updateChartData()
+})
+
+watch(currentNetworkInfoDataStack.value, () => {
+  updateChartData()
 })
 </script>
 
