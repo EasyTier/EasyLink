@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { hostname } from '@tauri-apps/plugin-os'
 import VChart from 'vue-echarts'
 import { use } from 'echarts/core'
-import { BarChart, LineChart } from 'echarts/charts'
+import { BarChart, GraphChart, LineChart } from 'echarts/charts'
 import type {
   AxisPointerComponentOption,
   GridComponentOption,
@@ -15,17 +16,15 @@ import {
 } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
 import type { ComposeOption } from 'echarts/core'
-import type { BarSeriesOption, LineSeriesOption } from 'echarts/charts'
+import type { BarSeriesOption, GraphSeriesOption, LineSeriesOption } from 'echarts/charts'
 
 const props = defineProps<{
   stack?: number
 }>()
 
-const stack = computed(() => props.stack || 30)
+use([GridComponent, TooltipComponent, LegendComponent, GraphChart, LineChart, BarChart, CanvasRenderer])
 
-use([GridComponent, TooltipComponent, LegendComponent, LineChart, BarChart, CanvasRenderer])
-
-type EChartsOption = ComposeOption<
+type BaseEChartsOption = ComposeOption<
   | TooltipComponentOption
   | LegendComponentOption
   | GridComponentOption
@@ -34,18 +33,46 @@ type EChartsOption = ComposeOption<
   | AxisPointerComponentOption
 >
 
+type TopologyEChartsOption = ComposeOption<
+  | LegendComponentOption
+  | TooltipComponentOption
+  | GraphSeriesOption
+>
+
+const deviceName = ref('')
+const stack = computed(() => props.stack || 30)
+
 const networkStore = useNetworkStore()
 const appStore = useAppStore()
 
 const { isDark } = storeToRefs(appStore)
-const { currentNetworkInfoDataStack, networkCurrentId } = storeToRefs(networkStore)
+const { currentNetworkInfoDataStack, networkCurrentId, currentNetworkInfo, currentNetwork } = storeToRefs(networkStore)
 
 const xAxisData = ref<(string | null)[]>([])
 const rxLineData = ref<(number | null)[]>([])
 const txLineData = ref<(number | null)[]>([])
 const peerSumLineData = ref<(number | null)[]>([])
 
-const option = computed<EChartsOption>(() => {
+const graphData = ref<{
+  nodes: { id: string, name: string, value: string, symbolSize?: number }[]
+  links: { source: string, target: string }[]
+  categories?: { name: string }[]
+}>({
+  nodes: [],
+  links: [],
+})
+
+const last = ref<{
+  nodes: string[]
+  ip: string | null
+  ipIsEmpty: number
+}>({
+  nodes: [],
+  ip: null,
+  ipIsEmpty: 0,
+})
+
+const baseOption = computed<BaseEChartsOption>(() => {
   return {
     backgroundColor: '',
     tooltip: {
@@ -120,7 +147,49 @@ const option = computed<EChartsOption>(() => {
   }
 })
 
-function updateChartData() {
+const topologyOption = computed<TopologyEChartsOption>(() => {
+  return {
+    backgroundColor: '',
+    legend: {},
+    tooltip: {},
+    animationDuration: 1500,
+    animationEasingUpdate: 'quinticInOut',
+    series: [
+      {
+        type: 'graph',
+        layout: 'force',
+        legendHoverLink: false,
+        data: graphData.value.nodes,
+        edges: graphData.value.links,
+        categories: graphData.value.categories,
+        roam: true,
+        force: {
+          repulsion: 300,
+        },
+        label: {
+          position: 'inside',
+          formatter: '{b} - {c}',
+        },
+        lineStyle: {
+          color: 'source',
+          curveness: 0.3,
+        },
+        emphasis: {
+          focus: 'adjacency',
+          lineStyle: {
+            width: 5,
+          },
+        },
+      },
+    ],
+  }
+})
+
+onMounted(async () => {
+  deviceName.value = await hostname() || ''
+})
+
+function updateBaseChartData() {
   let needStack = currentNetworkInfoDataStack.value.slice(-stack.value)
 
   const xAxisTemp: (string | null)[] = []
@@ -158,26 +227,71 @@ function updateChartData() {
   }
 }
 
+function updateTopologyChartData() {
+  if (currentNetworkInfo.value) {
+    const routeNodes = currentNetworkInfo.value.routes.map(d => d.peer_id.toString())
+    const ip = currentNetworkInfo.value.node.virtual_ipv4
+    if (JSON.stringify(last.value.nodes.sort()) !== JSON.stringify(routeNodes.sort()) && last.value.ip !== ip && last.value.ipIsEmpty < 10) {
+      const nodesTemp: { id: string, name: string, value: string, symbolSize?: number }[] = []
+      const linksTemp: { source: string, target: string }[] = []
+      // const categoryTemp: (string | null)[] = []
+      nodesTemp.push({
+        // id: c.peer_id.toString(),
+        id: ip,
+        name: currentNetwork.value?.config.deviceName || deviceName.value,
+        symbolSize: 45,
+        value: ip,
+      })
+      currentNetworkInfo.value.routes.forEach((c) => {
+        nodesTemp.push({
+          // id: c.peer_id.toString(),
+          id: c.ipv4_addr,
+          name: c.hostname,
+          symbolSize: 30,
+          value: c.ipv4_addr,
+        })
+
+        if (ip) {
+          linksTemp.push({
+            source: ip,
+            target: c.ipv4_addr,
+          })
+        }
+      })
+      graphData.value.nodes = nodesTemp
+      graphData.value.links = linksTemp
+      last.value.ip = ip
+      last.value.nodes = routeNodes
+
+      if (last.value.ip === '')
+        last.value.ipIsEmpty += 1
+    }
+  }
+}
+
 watch(networkCurrentId, () => {
   xAxisData.value = []
   rxLineData.value = []
   txLineData.value = []
-  updateChartData()
+  graphData.value = { nodes: [], links: [] }
+  updateBaseChartData()
+  updateTopologyChartData()
 })
 
 watch(currentNetworkInfoDataStack, () => {
-  updateChartData()
+  updateBaseChartData()
+  updateTopologyChartData()
 }, { immediate: true, deep: true })
 </script>
 
 <template>
   <n-flex w-full>
-    <n-tabs type="line" animated>
-      <n-tab-pane v-if="currentNetworkInfoDataStack" name="base" tab="base">
-        <VChart :theme="isDark ? 'dark' : undefined" class="chart" autoresize :option="option" />
+    <n-tabs v-if="currentNetworkInfoDataStack" type="line" animated>
+      <n-tab-pane name="base" tab="base">
+        <VChart :theme="isDark ? 'dark' : undefined" class="chart" autoresize :option="baseOption" />
       </n-tab-pane>
       <n-tab-pane name="topology" tab="topology">
-        <!-- TODO: -->
+        <VChart :theme="isDark ? 'dark' : undefined" class="chart" autoresize :option="topologyOption" />
       </n-tab-pane>
     </n-tabs>
   </n-flex>

@@ -64,6 +64,8 @@ declare global {
   const mapWritableState: typeof import('pinia')['mapWritableState']
   const markRaw: typeof import('vue')['markRaw']
   const needShowWatermark: typeof import('./composables/dev')['needShowWatermark']
+  const networkTopology: typeof import('./composables/network')['networkTopology']
+  const network_topology: typeof import('./composables/network')['network_topology']
   const nextTick: typeof import('vue')['nextTick']
   const onActivated: typeof import('vue')['onActivated']
   const onBeforeMount: typeof import('vue')['onBeforeMount']
