@@ -86,6 +86,7 @@ declare global {
   const onUpdated: typeof import('vue')['onUpdated']
   const parseNetworkConfig: typeof import('./composables/network')['parseNetworkConfig']
   const pausableWatch: typeof import('@vueuse/core')['pausableWatch']
+  const peerRoutePairToStatusData: typeof import('./composables/networkInfo')['peerRoutePairToStatusData']
   const preferredDark: typeof import('./composables/dark')['preferredDark']
   const provide: typeof import('vue')['provide']
   const provideLocal: typeof import('@vueuse/core')['provideLocal']
@@ -416,6 +417,7 @@ declare module 'vue' {
     readonly onUpdated: UnwrapRef<typeof import('vue')['onUpdated']>
     readonly parseNetworkConfig: UnwrapRef<typeof import('./composables/network')['parseNetworkConfig']>
     readonly pausableWatch: UnwrapRef<typeof import('@vueuse/core')['pausableWatch']>
+    readonly peerRoutePairToStatusData: UnwrapRef<typeof import('./composables/networkInfo')['peerRoutePairToStatusData']>
     readonly provide: UnwrapRef<typeof import('vue')['provide']>
     readonly provideLocal: UnwrapRef<typeof import('@vueuse/core')['provideLocal']>
     readonly reactify: UnwrapRef<typeof import('@vueuse/core')['reactify']>
@@ -733,6 +735,7 @@ declare module '@vue/runtime-core' {
     readonly onUpdated: UnwrapRef<typeof import('vue')['onUpdated']>
     readonly parseNetworkConfig: UnwrapRef<typeof import('./composables/network')['parseNetworkConfig']>
     readonly pausableWatch: UnwrapRef<typeof import('@vueuse/core')['pausableWatch']>
+    readonly peerRoutePairToStatusData: UnwrapRef<typeof import('./composables/networkInfo')['peerRoutePairToStatusData']>
     readonly provide: UnwrapRef<typeof import('vue')['provide']>
     readonly provideLocal: UnwrapRef<typeof import('@vueuse/core')['provideLocal']>
     readonly reactify: UnwrapRef<typeof import('@vueuse/core')['reactify']>

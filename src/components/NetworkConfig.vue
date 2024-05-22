@@ -69,7 +69,7 @@ onMounted(async () => {
               </n-flex>
             </template>
             <n-input
-              v-model:value="currentNetwork.config.ipv4" :disabled="currentNetwork.config.dhcp"
+              v-model:value="currentNetwork.config.ipv4" :disabled="currentNetwork.config.dhcp || isCurrentNetworkRunning"
               :placeholder="t('component.networkConfig.virtualIPPlaceholder')"
             />
           </n-form-item>
