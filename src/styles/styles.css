@@ -1,4 +1,7 @@
-html, body, #app, .n-config-provider {
+html,
+body,
+#app,
+.n-config-provider {
   @apply h-full w-full;
 }
 
