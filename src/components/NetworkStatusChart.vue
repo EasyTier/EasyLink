@@ -106,31 +106,29 @@ const baseOption = computed<BaseEChartsOption>(() => {
           },
         },
       },
-      {
-        type: 'log',
-        logBase: 5,
-        min: 0,
-        max: 255,
-        interval: [1, 50, 150, 250],
-        name: 'peers',
-        position: 'right',
-        axisLine: {
-          show: true,
-        },
-      },
+      // {
+      //   type: 'log',
+      //   logBase: 5,
+      //   min: 0,
+      //   max: 255,
+      //   interval: [1, 50, 150, 250],
+      //   name: 'peers',
+      //   position: 'right',
+      //   axisLine: {
+      //     show: true,
+      //   },
+      // },
     ],
     series: [
       {
         name: 'rx',
         type: 'line',
-        stack: 'Total',
         smooth: true,
         data: rxLineData.value,
       },
       {
         name: 'tx',
         type: 'line',
-        stack: 'Total',
         smooth: true,
         data: txLineData.value,
       },
