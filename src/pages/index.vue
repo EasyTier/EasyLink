@@ -40,6 +40,10 @@ async function startLink() {
 async function stopLink() {
   await stopNetwork()
 }
+
+// watch(networkInfo, (n) => {
+//   // setTrayRunState(n.length > 0)
+// })
 </script>
 
 <template>
@@ -163,11 +167,10 @@ async function stopLink() {
     </n-drawer-content>
   </n-drawer>
   <n-modal v-model:show="eventModal">
-    <n-card w="60%" :title=" t('page.index.event')" :bordered="false" role="dialog" aria-modal="true">
+    <n-card w="60%" :title="t('page.index.event')" :bordered="false" role="dialog" aria-modal="true">
       <NetworkEvent />
     </n-card>
   </n-modal>
 </template>
 
-<style scoped lang="postcss">
-</style>
+<style scoped lang="postcss"></style>

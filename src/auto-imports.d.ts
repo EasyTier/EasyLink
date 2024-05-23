@@ -8,6 +8,9 @@ declare global {
   const DEFAULT_NETWORK_CONFIG: typeof import('./types/network')['DEFAULT_NETWORK_CONFIG']
   const DEFAULT_NETWORK_OTHER_CONFIG: typeof import('./types/network')['DEFAULT_NETWORK_OTHER_CONFIG']
   const EffectScope: typeof import('vue')['EffectScope']
+  const MenuItemExit: typeof import('./composables/tray')['MenuItemExit']
+  const MenuItemHide: typeof import('./composables/tray')['MenuItemHide']
+  const MenuItemShow: typeof import('./composables/tray')['MenuItemShow']
   const NetworkStatus: typeof import('./types/network')['NetworkStatus']
   const NetworkingMethod: typeof import('./types/network')['NetworkingMethod']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
@@ -41,6 +44,8 @@ declare global {
   const eagerComputed: typeof import('@vueuse/core')['eagerComputed']
   const effectScope: typeof import('vue')['effectScope']
   const extendRef: typeof import('@vueuse/core')['extendRef']
+  const generateMenu: typeof import('./composables/tray')['generateMenu']
+  const generateMenuItem: typeof import('./composables/tray')['generateMenuItem']
   const getActivePinia: typeof import('pinia')['getActivePinia']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
   const getCurrentScope: typeof import('vue')['getCurrentScope']
@@ -63,6 +68,7 @@ declare global {
   const mapStores: typeof import('pinia')['mapStores']
   const mapWritableState: typeof import('pinia')['mapWritableState']
   const markRaw: typeof import('vue')['markRaw']
+  const name: typeof import('./composables/tray')['name']
   const needShowWatermark: typeof import('./composables/dev')['needShowWatermark']
   const networkTopology: typeof import('./composables/network')['networkTopology']
   const network_topology: typeof import('./composables/network')['network_topology']
@@ -112,6 +118,9 @@ declare global {
   const runNetworkInstance: typeof import('./composables/network')['runNetworkInstance']
   const setActivePinia: typeof import('pinia')['setActivePinia']
   const setMapStoreSuffix: typeof import('pinia')['setMapStoreSuffix']
+  const setTrayMenu: typeof import('./composables/tray')['setTrayMenu']
+  const setTrayRunState: typeof import('./composables/tray')['setTrayRunState']
+  const setTrayTooltip: typeof import('./composables/tray')['setTrayTooltip']
   const shallowReactive: typeof import('vue')['shallowReactive']
   const shallowReadonly: typeof import('vue')['shallowReadonly']
   const shallowRef: typeof import('vue')['shallowRef']
@@ -296,6 +305,7 @@ declare global {
   const useToString: typeof import('@vueuse/core')['useToString']
   const useToggle: typeof import('@vueuse/core')['useToggle']
   const useTransition: typeof import('@vueuse/core')['useTransition']
+  const useTray: typeof import('./composables/tray')['useTray']
   const useUrlSearchParams: typeof import('@vueuse/core')['useUrlSearchParams']
   const useUserMedia: typeof import('@vueuse/core')['useUserMedia']
   const useVModel: typeof import('@vueuse/core')['useVModel']
@@ -344,6 +354,8 @@ declare module 'vue' {
     readonly DEFAULT_NETWORK_CONFIG: UnwrapRef<typeof import('./types/network')['DEFAULT_NETWORK_CONFIG']>
     readonly DEFAULT_NETWORK_OTHER_CONFIG: UnwrapRef<typeof import('./types/network')['DEFAULT_NETWORK_OTHER_CONFIG']>
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
+    readonly MenuItemExit: UnwrapRef<typeof import('./composables/tray')['MenuItemExit']>
+    readonly MenuItemShow: UnwrapRef<typeof import('./composables/tray')['MenuItemShow']>
     readonly NetworkStatus: UnwrapRef<typeof import('./types/network')['NetworkStatus']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('pinia')['acceptHMRUpdate']>
     readonly asyncComputed: UnwrapRef<typeof import('@vueuse/core')['asyncComputed']>
@@ -376,6 +388,7 @@ declare module 'vue' {
     readonly eagerComputed: UnwrapRef<typeof import('@vueuse/core')['eagerComputed']>
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly extendRef: UnwrapRef<typeof import('@vueuse/core')['extendRef']>
+    readonly generateMenuItem: UnwrapRef<typeof import('./composables/tray')['generateMenuItem']>
     readonly getActivePinia: UnwrapRef<typeof import('pinia')['getActivePinia']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
@@ -440,6 +453,9 @@ declare module 'vue' {
     readonly resolveUnref: UnwrapRef<typeof import('@vueuse/core')['resolveUnref']>
     readonly setActivePinia: UnwrapRef<typeof import('pinia')['setActivePinia']>
     readonly setMapStoreSuffix: UnwrapRef<typeof import('pinia')['setMapStoreSuffix']>
+    readonly setTrayMenu: UnwrapRef<typeof import('./composables/tray')['setTrayMenu']>
+    readonly setTrayRunState: UnwrapRef<typeof import('./composables/tray')['setTrayRunState']>
+    readonly setTrayTooltip: UnwrapRef<typeof import('./composables/tray')['setTrayTooltip']>
     readonly shallowReactive: UnwrapRef<typeof import('vue')['shallowReactive']>
     readonly shallowReadonly: UnwrapRef<typeof import('vue')['shallowReadonly']>
     readonly shallowRef: UnwrapRef<typeof import('vue')['shallowRef']>
@@ -621,6 +637,7 @@ declare module 'vue' {
     readonly useToString: UnwrapRef<typeof import('@vueuse/core')['useToString']>
     readonly useToggle: UnwrapRef<typeof import('@vueuse/core')['useToggle']>
     readonly useTransition: UnwrapRef<typeof import('@vueuse/core')['useTransition']>
+    readonly useTray: UnwrapRef<typeof import('./composables/tray')['useTray']>
     readonly useUrlSearchParams: UnwrapRef<typeof import('@vueuse/core')['useUrlSearchParams']>
     readonly useUserMedia: UnwrapRef<typeof import('@vueuse/core')['useUserMedia']>
     readonly useVModel: UnwrapRef<typeof import('@vueuse/core')['useVModel']>
@@ -662,6 +679,8 @@ declare module '@vue/runtime-core' {
     readonly DEFAULT_NETWORK_CONFIG: UnwrapRef<typeof import('./types/network')['DEFAULT_NETWORK_CONFIG']>
     readonly DEFAULT_NETWORK_OTHER_CONFIG: UnwrapRef<typeof import('./types/network')['DEFAULT_NETWORK_OTHER_CONFIG']>
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
+    readonly MenuItemExit: UnwrapRef<typeof import('./composables/tray')['MenuItemExit']>
+    readonly MenuItemShow: UnwrapRef<typeof import('./composables/tray')['MenuItemShow']>
     readonly NetworkStatus: UnwrapRef<typeof import('./types/network')['NetworkStatus']>
     readonly acceptHMRUpdate: UnwrapRef<typeof import('pinia')['acceptHMRUpdate']>
     readonly asyncComputed: UnwrapRef<typeof import('@vueuse/core')['asyncComputed']>
@@ -694,6 +713,7 @@ declare module '@vue/runtime-core' {
     readonly eagerComputed: UnwrapRef<typeof import('@vueuse/core')['eagerComputed']>
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly extendRef: UnwrapRef<typeof import('@vueuse/core')['extendRef']>
+    readonly generateMenuItem: UnwrapRef<typeof import('./composables/tray')['generateMenuItem']>
     readonly getActivePinia: UnwrapRef<typeof import('pinia')['getActivePinia']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
@@ -758,6 +778,9 @@ declare module '@vue/runtime-core' {
     readonly resolveUnref: UnwrapRef<typeof import('@vueuse/core')['resolveUnref']>
     readonly setActivePinia: UnwrapRef<typeof import('pinia')['setActivePinia']>
     readonly setMapStoreSuffix: UnwrapRef<typeof import('pinia')['setMapStoreSuffix']>
+    readonly setTrayMenu: UnwrapRef<typeof import('./composables/tray')['setTrayMenu']>
+    readonly setTrayRunState: UnwrapRef<typeof import('./composables/tray')['setTrayRunState']>
+    readonly setTrayTooltip: UnwrapRef<typeof import('./composables/tray')['setTrayTooltip']>
     readonly shallowReactive: UnwrapRef<typeof import('vue')['shallowReactive']>
     readonly shallowReadonly: UnwrapRef<typeof import('vue')['shallowReadonly']>
     readonly shallowRef: UnwrapRef<typeof import('vue')['shallowRef']>
@@ -939,6 +962,7 @@ declare module '@vue/runtime-core' {
     readonly useToString: UnwrapRef<typeof import('@vueuse/core')['useToString']>
     readonly useToggle: UnwrapRef<typeof import('@vueuse/core')['useToggle']>
     readonly useTransition: UnwrapRef<typeof import('@vueuse/core')['useTransition']>
+    readonly useTray: UnwrapRef<typeof import('./composables/tray')['useTray']>
     readonly useUrlSearchParams: UnwrapRef<typeof import('@vueuse/core')['useUrlSearchParams']>
     readonly useUserMedia: UnwrapRef<typeof import('@vueuse/core')['useUserMedia']>
     readonly useVModel: UnwrapRef<typeof import('@vueuse/core')['useVModel']>

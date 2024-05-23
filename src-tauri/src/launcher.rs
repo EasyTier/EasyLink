@@ -53,7 +53,7 @@ pub struct Launcher {
     error: Arc<RwLock<Option<String>>>,
     data: Data,
 
-    app: Arc<AppHandle>
+    app: Arc<AppHandle>,
 }
 
 impl Launcher {
@@ -73,7 +73,7 @@ impl Launcher {
     async fn handle_easytier_event(event: (DateTime<Local>, GlobalCtxEvent), data: Data) {
         let mut events = data.events.write().unwrap();
         events.push_back(event);
-        
+
         if events.len() > 100 {
             events.pop_front();
         }
@@ -83,7 +83,7 @@ impl Launcher {
         cfg: TomlConfigLoader,
         stop_signal: Arc<tokio::sync::Notify>,
         data: Data,
-        app: Arc<AppHandle>
+        app: Arc<AppHandle>,
     ) -> Result<(), anyhow::Error> {
         use tauri::Manager;
         let mut instance = Instance::new(cfg);
@@ -98,11 +98,15 @@ impl Launcher {
                 let now = chrono::Local::now();
                 Self::handle_easytier_event((now, event.clone()), data_c.clone()).await;
                 tracing::info!("event: {:?}", event.clone());
-                app.emit("easytier://event", Event {
-                    id: global_ctx.get_id().to_string(),
-                    event,
-                    time: now,
-                }).unwrap();
+                app.emit(
+                    "easytier://event",
+                    Event {
+                        id: global_ctx.get_id().to_string(),
+                        event,
+                        time: now,
+                    },
+                )
+                .unwrap();
             }
         });
 

@@ -56,6 +56,12 @@ component:
   networkList:
     filterResults: 筛选结果
 
+app:
+  sureToExit: 退出
+  sureToExitContent: 确认要退出吗?
+  minimize: 最小化
+  exit: 退出
+
 layout:
   default:
     config: 设置
@@ -75,3 +81,7 @@ network:
     error: 发生错误
     off: 未启动
     stopped: 已停止
+
+tray:
+  show: 显示 / 隐藏
+  exit: 退出
