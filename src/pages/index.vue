@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import { Menu, MenuItem } from '@tauri-apps/api/menu'
+
 const { t } = useI18n()
 const message = useMessage()
 const appStore = useAppStore()
 const networkStore = useNetworkStore()
 const { showMultipleNetwork } = storeToRefs(appStore)
 const { addNetwork, removeNetwork, startNetwork, stopNetwork } = networkStore
-const { networkList, networkCurrentId, currentNetwork, isCurrentNetworkRunning } = storeToRefs(networkStore)
+const { networkList, networkInfo, networkCurrentId, currentNetwork, isCurrentNetworkRunning } = storeToRefs(networkStore)
 const configDrawer = ref(false)
 const statusDrawer = ref(false)
 const eventModal = ref(false)
@@ -40,6 +42,10 @@ async function startLink() {
 async function stopLink() {
   await stopNetwork()
 }
+
+watch(networkInfo, (n) => {
+  setTrayRunState(n.length > 0)
+})
 </script>
 
 <template>
@@ -163,11 +169,10 @@ async function stopLink() {
     </n-drawer-content>
   </n-drawer>
   <n-modal v-model:show="eventModal">
-    <n-card w="60%" :title=" t('page.index.event')" :bordered="false" role="dialog" aria-modal="true">
+    <n-card w="60%" :title="t('page.index.event')" :bordered="false" role="dialog" aria-modal="true">
       <NetworkEvent />
     </n-card>
   </n-modal>
 </template>
 
-<style scoped lang="postcss">
-</style>
+<style scoped lang="postcss"></style>

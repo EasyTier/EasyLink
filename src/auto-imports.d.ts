@@ -63,6 +63,7 @@ declare global {
   const mapStores: typeof import('pinia')['mapStores']
   const mapWritableState: typeof import('pinia')['mapWritableState']
   const markRaw: typeof import('vue')['markRaw']
+  const name: typeof import('./composables/tray')['name']
   const needShowWatermark: typeof import('./composables/dev')['needShowWatermark']
   const networkTopology: typeof import('./composables/network')['networkTopology']
   const network_topology: typeof import('./composables/network')['network_topology']
@@ -112,6 +113,8 @@ declare global {
   const runNetworkInstance: typeof import('./composables/network')['runNetworkInstance']
   const setActivePinia: typeof import('pinia')['setActivePinia']
   const setMapStoreSuffix: typeof import('pinia')['setMapStoreSuffix']
+  const setTrayMenu: typeof import('./composables/tray')['setTrayMenu']
+  const setTrayRunState: typeof import('./composables/tray')['setTrayRunState']
   const shallowReactive: typeof import('vue')['shallowReactive']
   const shallowReadonly: typeof import('vue')['shallowReadonly']
   const shallowRef: typeof import('vue')['shallowRef']
@@ -296,6 +299,7 @@ declare global {
   const useToString: typeof import('@vueuse/core')['useToString']
   const useToggle: typeof import('@vueuse/core')['useToggle']
   const useTransition: typeof import('@vueuse/core')['useTransition']
+  const useTray: typeof import('./composables/tray')['useTray']
   const useUrlSearchParams: typeof import('@vueuse/core')['useUrlSearchParams']
   const useUserMedia: typeof import('@vueuse/core')['useUserMedia']
   const useVModel: typeof import('@vueuse/core')['useVModel']
@@ -440,6 +444,8 @@ declare module 'vue' {
     readonly resolveUnref: UnwrapRef<typeof import('@vueuse/core')['resolveUnref']>
     readonly setActivePinia: UnwrapRef<typeof import('pinia')['setActivePinia']>
     readonly setMapStoreSuffix: UnwrapRef<typeof import('pinia')['setMapStoreSuffix']>
+    readonly setTrayMenu: UnwrapRef<typeof import('./composables/tray')['setTrayMenu']>
+    readonly setTrayRunState: UnwrapRef<typeof import('./composables/tray')['setTrayRunState']>
     readonly shallowReactive: UnwrapRef<typeof import('vue')['shallowReactive']>
     readonly shallowReadonly: UnwrapRef<typeof import('vue')['shallowReadonly']>
     readonly shallowRef: UnwrapRef<typeof import('vue')['shallowRef']>
@@ -621,6 +627,7 @@ declare module 'vue' {
     readonly useToString: UnwrapRef<typeof import('@vueuse/core')['useToString']>
     readonly useToggle: UnwrapRef<typeof import('@vueuse/core')['useToggle']>
     readonly useTransition: UnwrapRef<typeof import('@vueuse/core')['useTransition']>
+    readonly useTray: UnwrapRef<typeof import('./composables/tray')['useTray']>
     readonly useUrlSearchParams: UnwrapRef<typeof import('@vueuse/core')['useUrlSearchParams']>
     readonly useUserMedia: UnwrapRef<typeof import('@vueuse/core')['useUserMedia']>
     readonly useVModel: UnwrapRef<typeof import('@vueuse/core')['useVModel']>
@@ -758,6 +765,8 @@ declare module '@vue/runtime-core' {
     readonly resolveUnref: UnwrapRef<typeof import('@vueuse/core')['resolveUnref']>
     readonly setActivePinia: UnwrapRef<typeof import('pinia')['setActivePinia']>
     readonly setMapStoreSuffix: UnwrapRef<typeof import('pinia')['setMapStoreSuffix']>
+    readonly setTrayMenu: UnwrapRef<typeof import('./composables/tray')['setTrayMenu']>
+    readonly setTrayRunState: UnwrapRef<typeof import('./composables/tray')['setTrayRunState']>
     readonly shallowReactive: UnwrapRef<typeof import('vue')['shallowReactive']>
     readonly shallowReadonly: UnwrapRef<typeof import('vue')['shallowReadonly']>
     readonly shallowRef: UnwrapRef<typeof import('vue')['shallowRef']>
@@ -939,6 +948,7 @@ declare module '@vue/runtime-core' {
     readonly useToString: UnwrapRef<typeof import('@vueuse/core')['useToString']>
     readonly useToggle: UnwrapRef<typeof import('@vueuse/core')['useToggle']>
     readonly useTransition: UnwrapRef<typeof import('@vueuse/core')['useTransition']>
+    readonly useTray: UnwrapRef<typeof import('./composables/tray')['useTray']>
     readonly useUrlSearchParams: UnwrapRef<typeof import('@vueuse/core')['useUrlSearchParams']>
     readonly useUserMedia: UnwrapRef<typeof import('@vueuse/core')['useUserMedia']>
     readonly useVModel: UnwrapRef<typeof import('@vueuse/core')['useVModel']>

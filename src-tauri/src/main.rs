@@ -3,6 +3,8 @@
 pub mod invoke;
 pub mod launcher;
 
+use tauri::tray::TrayIconBuilder;
+
 use crate::invoke::*;
 
 fn main() {
@@ -16,6 +18,15 @@ fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_positioner::init())
+        .setup(|app| {
+            TrayIconBuilder::new()
+                .on_tray_icon_event(|app, event| {
+                    tauri_plugin_positioner::on_tray_event(app.app_handle(), &event);
+                })
+                .build(app)?;
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             parse_network_config,
             start_network_instance,
