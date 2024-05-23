@@ -22,7 +22,13 @@ const menuOptions = computed(() => [
       key: l,
       disabled: l === locale.value,
       props: {
-        onClick: async () => await loadLanguageAsync(l),
+        onClick: async () => {
+          await loadLanguageAsync(l)
+          await setTrayMenu([
+            await MenuItemExit(t('tray.exit')),
+            await MenuItemShow(t('tray.show')),
+          ])
+        },
       },
     })),
   },
@@ -44,6 +50,10 @@ const archName = ref('')
 onMounted(async () => {
   platformName.value = await platform()
   archName.value = await arch()
+  await setTrayMenu([
+    await MenuItemExit(t('tray.exit')),
+    await MenuItemShow(t('tray.show')),
+  ])
 })
 </script>
 

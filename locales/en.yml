@@ -55,6 +55,12 @@ component:
   networkList:
     filterResults: Filter Results
 
+app:
+  sureToExit: Exit
+  sureToExitContent: Are you sure you want to exit?
+  minimize: Minimize
+  exit: Exit
+
 layout:
   default:
     config: Config
@@ -74,3 +80,7 @@ network:
     error: error
     off: off
     stopped: stopped
+
+tray:
+  show: show / hide
+  exit: exit

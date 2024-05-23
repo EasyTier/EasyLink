@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { Menu, MenuItem } from '@tauri-apps/api/menu'
-
 const { t } = useI18n()
 const message = useMessage()
 const appStore = useAppStore()
 const networkStore = useNetworkStore()
 const { showMultipleNetwork } = storeToRefs(appStore)
 const { addNetwork, removeNetwork, startNetwork, stopNetwork } = networkStore
-const { networkList, networkInfo, networkCurrentId, currentNetwork, isCurrentNetworkRunning } = storeToRefs(networkStore)
+const { networkList, networkCurrentId, currentNetwork, isCurrentNetworkRunning } = storeToRefs(networkStore)
 const configDrawer = ref(false)
 const statusDrawer = ref(false)
 const eventModal = ref(false)
@@ -43,9 +41,9 @@ async function stopLink() {
   await stopNetwork()
 }
 
-watch(networkInfo, (n) => {
-  setTrayRunState(n.length > 0)
-})
+// watch(networkInfo, (n) => {
+//   // setTrayRunState(n.length > 0)
+// })
 </script>
 
 <template>

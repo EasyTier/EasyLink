@@ -9,6 +9,9 @@
     "path:default",
     "event:default",
     "window:default",
+    "window:allow-is-visible",
+    "window:allow-show",
+    "window:allow-hide",
     "app:default",
     "image:default",
     "resources:default",
@@ -34,6 +37,9 @@
     "os:allow-hostname",
     "os:allow-os-type",
     "os:allow-platform",
-    "positioner:default"
+    "positioner:default",
+    "process:default",
+    "process:allow-exit",
+    "process:allow-restart"
   ]
 }
