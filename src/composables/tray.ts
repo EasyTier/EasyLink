@@ -1,11 +1,10 @@
-import { Window } from '@tauri-apps/api/window'
+import { getCurrent } from '@tauri-apps/api/window'
 import { Menu, MenuItem } from '@tauri-apps/api/menu'
 import { TrayIcon } from '@tauri-apps/api/tray'
 import { exit } from '@tauri-apps/plugin-process'
 import pkg from '~/../package.json'
 
 const DEFAULT_TRAY_NAME = 'main'
-const appWindow = new Window('main')
 
 export async function useTray() {
   let tray = await TrayIcon.getById(DEFAULT_TRAY_NAME)
@@ -18,6 +17,11 @@ export async function useTray() {
         id: 'main',
         items: await generateMenuItem(),
       }),
+      action: async (_e) => {
+        // TODO: TypeError: window[("_" + 264693309)] is not a function
+        // if (_e.clickType === 'Double' && !await getCurrent().isVisible())
+        //   await getCurrent().show()
+      },
     })
   }
   return tray
@@ -45,9 +49,9 @@ export async function MenuItemShow(text: string = 'show / hide') {
     id: 'show',
     text,
     action: async () => {
-      await appWindow.isVisible()
-        ? await appWindow.hide()
-        : await appWindow.show()
+      await getCurrent().isVisible()
+        ? await getCurrent().hide()
+        : await getCurrent().show()
     },
   })
 }

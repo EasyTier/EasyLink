@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Window } from '@tauri-apps/api/window'
+import { getCurrent } from '@tauri-apps/api/window'
 import { exit } from '@tauri-apps/plugin-process'
 import hljs from 'highlight.js'
 import type { UnlistenFn } from '@tauri-apps/api/event'
@@ -10,7 +10,6 @@ import type { InstanceEvent, Network, NetworkInstanceInfo } from './types/networ
 const { locale, t } = useI18n()
 const appStore = useAppStore()
 const networkStore = useNetworkStore()
-const appWindow = new Window('main')
 const { isDark } = storeToRefs(appStore)
 const { pushInfoStack } = networkStore
 const { networkInfo, networkList } = storeToRefs(networkStore)
@@ -23,7 +22,7 @@ const requestListen = ref<UnlistenFn | null>(null)
 const closeModel = ref(false)
 
 async function hideCallback() {
-  await appWindow.hide()
+  await getCurrent().hide()
 }
 
 async function closeCallback() {

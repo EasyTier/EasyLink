@@ -11,6 +11,7 @@ declare global {
   const MenuItemExit: typeof import('./composables/tray')['MenuItemExit']
   const MenuItemHide: typeof import('./composables/tray')['MenuItemHide']
   const MenuItemShow: typeof import('./composables/tray')['MenuItemShow']
+  const MenuMain: typeof import('./composables/tray')['MenuMain']
   const NetworkStatus: typeof import('./types/network')['NetworkStatus']
   const NetworkingMethod: typeof import('./types/network')['NetworkingMethod']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
