@@ -86,7 +86,9 @@ onMounted(async () => {
         </n-flex>
       </n-layout-header>
       <n-layout-content content-class="p-2 h-full" h-full :style="{ 'max-height': 'calc(100vh - 48px)' }">
-        <RouterView />
+        <n-scrollbar>
+          <RouterView />
+        </n-scrollbar>
       </n-layout-content>
     </n-layout>
   </n-layout>
