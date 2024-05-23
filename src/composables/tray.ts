@@ -6,13 +6,12 @@ import pkg from '~/../package.json'
 
 const DEFAULT_TRAY_NAME = 'main'
 
-export async function useTray() {
+export async function useTray(init: boolean = false) {
   let tray = await TrayIcon.getById(DEFAULT_TRAY_NAME)
   if (!tray) {
     tray = await TrayIcon.new({
       tooltip: `EasyLink\n${pkg.version}`,
       id: DEFAULT_TRAY_NAME,
-      icon: 'icons/icon.ico',
       menu: await Menu.new({
         id: 'main',
         items: await generateMenuItem(),
@@ -24,6 +23,15 @@ export async function useTray() {
       },
     })
   }
+
+  if (init) {
+    tray.setTooltip(`EasyLink\n${pkg.version}`)
+    tray.setMenu(await Menu.new({
+      id: 'main',
+      items: await generateMenuItem(),
+    }))
+  }
+
   return tray
 }
 

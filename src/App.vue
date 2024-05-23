@@ -29,7 +29,7 @@ async function closeCallback() {
   await exit(0)
 }
 
-useTray()
+useTray(true)
 
 onMounted(async () => {
   eventListen.value = await listen<InstanceEvent>('easytier://event', () => {
@@ -56,6 +56,7 @@ onBeforeUnmount(() => {
   // eventListen.value && eventListen.value()
   eventListen.value?.()
   infoListen.value?.()
+  requestListen.value?.()
 })
 </script>
 
