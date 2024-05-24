@@ -7,12 +7,14 @@ import NetworkListAction from '~/components/NetworkListAction.vue'
 const { locale, t } = useI18n()
 const appStore = useAppStore()
 
-const { isDark, showMultipleNetwork } = storeToRefs(appStore)
+const { isDark, showMultipleNetwork, configModel } = storeToRefs(appStore)
 const menuOptions = computed(() => [
   {
     label: t('layout.default.config'),
     key: 'config',
-    disabled: true,
+    props: {
+      onClick: () => configModel.value = true,
+    },
   },
   {
     label: t('layout.default.language'),
@@ -102,6 +104,9 @@ onMounted(async () => {
       </n-layout-content>
     </n-layout>
   </n-layout>
+  <n-modal v-model:show="configModel">
+    <AppConfig />
+  </n-modal>
 </template>
 
 <style scoped lang="postcss">

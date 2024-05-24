@@ -4,6 +4,7 @@ pub mod invoke;
 pub mod launcher;
 
 use tauri::Manager;
+use tauri_plugin_autostart::MacosLauncher;
 
 use crate::invoke::*;
 
@@ -16,10 +17,14 @@ fn main() {
     }
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            Some(vec!["--autostart"])
+        ))
+        .plugin(tauri_plugin_notification::init())
         .on_window_event(|window, event| match event {
             tauri::WindowEvent::CloseRequested { api, .. } => {
                 let _ = window.emit("close_requested", ());
-                // window.hide().unwrap();
                 api.prevent_close();
             }
             _ => {}
