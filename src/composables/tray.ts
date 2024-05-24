@@ -11,6 +11,7 @@ export async function useTray(init: boolean = false) {
   if (!tray) {
     tray = await TrayIcon.new({
       tooltip: `EasyLink\n${pkg.version}`,
+      title: `EasyLink\n${pkg.version}`,
       id: DEFAULT_TRAY_NAME,
       menu: await Menu.new({
         id: 'main',
@@ -82,5 +83,6 @@ export async function setTrayTooltip(tooltip: string) {
   if (tooltip) {
     const tray = await useTray()
     tray.setTooltip(`EasyLink\n${pkg.version}\n${tooltip}`)
+    tray.setTitle(`EasyLink\n${pkg.version}\n${tooltip}`)
   }
 }

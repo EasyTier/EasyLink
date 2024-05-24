@@ -25,6 +25,7 @@
     "trayIcon": {
       "iconPath": "icons/32x32.png",
       "tooltip": "EasyLink",
+      "title": "EasyLink",
       "id": "main"
     }
   },
