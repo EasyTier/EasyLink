@@ -20,3 +20,7 @@ export async function collectNetworkInfos() {
 export async function test_config(cfg: NetworkConfig) {
   return await invoke('test_config', { config: cfg })
 }
+
+export async function isAutostart() {
+  return await invoke<boolean>('is_autostart')
+}

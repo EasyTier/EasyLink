@@ -303,3 +303,13 @@ pub fn test_config(config: NetworkConfig) -> Result<NetworkConfig, String> {
     println!("{:?}", config);
     Ok(config)
 }
+
+
+#[tauri::command]
+pub fn is_autostart() -> Result<bool, String> {
+    let args: Vec<String> = std::env::args().collect();
+    println!("{:?}", args);
+    Ok(args.contains(&crate::AUTOSTART_ARG.to_owned()))
+}
+
+
