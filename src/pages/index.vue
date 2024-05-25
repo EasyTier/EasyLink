@@ -3,6 +3,7 @@ const { t } = useI18n()
 const message = useMessage()
 const appStore = useAppStore()
 const networkStore = useNetworkStore()
+const { cleanAutostartNetwork } = appStore
 const { showMultipleNetwork } = storeToRefs(appStore)
 const { addNetwork, removeNetwork, startNetwork, stopNetwork } = networkStore
 const { networkList, networkCurrentId, currentNetwork, isCurrentNetworkRunning } = storeToRefs(networkStore)
@@ -13,6 +14,7 @@ const eventModal = ref(false)
 function removeThisNetwork(id: string) {
   if (id) {
     removeNetwork(id)
+    cleanAutostartNetwork(id)
     networkCurrentId.value = ''
   }
 }
@@ -40,10 +42,6 @@ async function startLink() {
 async function stopLink() {
   await stopNetwork()
 }
-
-// watch(networkInfo, (n) => {
-//   // setTrayRunState(n.length > 0)
-// })
 </script>
 
 <template>
@@ -52,11 +50,9 @@ async function stopLink() {
       <n-gi offset="1" span="8">
         <n-flex :wrap="false">
           <n-input-group v-if="currentNetwork.otherConfig.token">
-            <n-input
-              v-model:value="currentNetwork.config.token" type="text" text-center
+            <n-input v-model:value="currentNetwork.config.token" type="text" text-center
               :placeholder="t('page.index.tokenPlaceholder')" size="medium" :style="{ width: '100%' }"
-              :disabled="isCurrentNetworkRunning"
-            />
+              :disabled="isCurrentNetworkRunning" />
 
             <n-tooltip trigger="hover">
               <template #trigger>
@@ -70,16 +66,12 @@ async function stopLink() {
             </n-tooltip>
           </n-input-group>
           <n-input-group v-else>
-            <n-input
-              v-model:value="currentNetwork.config.networkName" text-center type="text"
+            <n-input v-model:value="currentNetwork.config.networkName" text-center type="text"
               :disabled="isCurrentNetworkRunning" :placeholder="t('page.index.networkNamePlaceholder')"
-              :style="{ width: '55%' }"
-            />
-            <n-input
-              v-model:value="currentNetwork.config.networkSecret" text-center type="text"
+              :style="{ width: '55%' }" />
+            <n-input v-model:value="currentNetwork.config.networkSecret" text-center type="text"
               :disabled="isCurrentNetworkRunning" :placeholder="t('page.index.networkSecretPlaceholder')"
-              :style="{ width: '45%' }"
-            />
+              :style="{ width: '45%' }" />
           </n-input-group>
           <n-button v-if="!isCurrentNetworkRunning" type="primary" size="medium" @click="startLink">
             {{ t('page.index.networking') }}
@@ -122,10 +114,8 @@ async function stopLink() {
             {{ t('page.index.useTokenOrGroup') }}
           </n-tooltip>
 
-          <n-popconfirm
-            v-if="showMultipleNetwork && !isCurrentNetworkRunning" :negative-text="t('page.index.delete')"
-            :positive-text="t('page.index.cancel')" @negative-click="removeThisNetwork(currentNetwork.config.id)"
-          >
+          <n-popconfirm v-if="showMultipleNetwork && !isCurrentNetworkRunning" :negative-text="t('page.index.delete')"
+            :positive-text="t('page.index.cancel')" @negative-click="removeThisNetwork(currentNetwork.config.id)">
             <template #trigger>
               <n-button text style="--n-text-color-hover: #e98b8b">
                 <template #icon>
@@ -145,10 +135,8 @@ async function stopLink() {
       </n-gi>
     </n-grid>
 
-    <n-result
-      v-else w-full status="404" :title="t('page.index.noNetworkTitle')"
-      :description="t('page.index.noNetworkDescription')"
-    >
+    <n-result v-else w-full status="404" :title="t('page.index.noNetworkTitle')"
+      :description="t('page.index.noNetworkDescription')">
       <template #footer>
         <n-button @click="addAndSelectNetwork">
           {{ t('page.index.addAndSelectNewNetwork') }}

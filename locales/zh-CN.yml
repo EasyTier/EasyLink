@@ -55,6 +55,12 @@ component:
     confirmResetMessageTwice: 注意！重置不可恢复。
   networkList:
     filterResults: 筛选结果
+  appConfig:
+    title: 应用配置
+    autostart:
+      title: 开机自启动
+      enable: 已启用
+      disable: 已禁用
 
 app:
   sureToExit: 退出

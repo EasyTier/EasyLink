@@ -11,6 +11,12 @@ importers:
       '@tauri-apps/api':
         specifier: '>=2.0.0-beta.0'
         version: 2.0.0-beta.11
+      '@tauri-apps/plugin-autostart':
+        specifier: 2.0.0-beta.3
+        version: 2.0.0-beta.3
+      '@tauri-apps/plugin-notification':
+        specifier: 2.0.0-beta.3
+        version: 2.0.0-beta.3
       '@tauri-apps/plugin-os':
         specifier: 2.0.0-beta.3
         version: 2.0.0-beta.3
@@ -865,6 +871,12 @@ packages:
     resolution: {integrity: sha512-41a0fuu4OWC+vVWQVp/klOm2B5qJnX1ymITzyy8aFZ1ebQLiT2vQicrvcfCZUdY3u2yqhwLR8JVsIvvbQINLOA==}
     engines: {node: '>= 10'}
     hasBin: true
+
+  '@tauri-apps/plugin-autostart@2.0.0-beta.3':
+    resolution: {integrity: sha512-+qIHvO+cfe8MnRxa23l5ebF5rZMt6Jd7FjCD9zoVm/KdYpb0VIhixsYvrLjty9eUWcp8k3XVknfttnvw/veHmg==}
+
+  '@tauri-apps/plugin-notification@2.0.0-beta.3':
+    resolution: {integrity: sha512-OCwvX10JrOgJh50HXIGD9EHgGUMtdYAZ+Q5peGCSS3/aA8XWL1GOENtC7CNb0P+W7HjRAj2N8jtEApgV0kD6Gg==}
 
   '@tauri-apps/plugin-os@2.0.0-beta.3':
     resolution: {integrity: sha512-kuTfns6z7z/RKAqij3293fnSsgRHlogO/SzNWziFDGHpijGUm/peH70Cv45LKvHw+7kEMX+nfHFWOZm8UEVy/w==}
@@ -4169,6 +4181,14 @@ snapshots:
       '@tauri-apps/cli-win32-arm64-msvc': 2.0.0-beta.17
       '@tauri-apps/cli-win32-ia32-msvc': 2.0.0-beta.17
       '@tauri-apps/cli-win32-x64-msvc': 2.0.0-beta.17
+
+  '@tauri-apps/plugin-autostart@2.0.0-beta.3':
+    dependencies:
+      '@tauri-apps/api': 2.0.0-beta.11
+
+  '@tauri-apps/plugin-notification@2.0.0-beta.3':
+    dependencies:
+      '@tauri-apps/api': 2.0.0-beta.11
 
   '@tauri-apps/plugin-os@2.0.0-beta.3':
     dependencies:

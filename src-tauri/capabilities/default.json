@@ -40,6 +40,14 @@
     "positioner:default",
     "process:default",
     "process:allow-exit",
-    "process:allow-restart"
+    "process:allow-restart",
+    "notification:default",
+    "notification:allow-is-permission-granted",
+    "notification:allow-notify",
+    "notification:allow-request-permission",
+    "autostart:default",
+    "autostart:allow-disable",
+    "autostart:allow-enable",
+    "autostart:allow-is-enabled"
   ]
 }

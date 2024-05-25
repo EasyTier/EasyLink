@@ -4,22 +4,28 @@ pub mod invoke;
 pub mod launcher;
 
 use tauri::Manager;
+use tauri_plugin_autostart::MacosLauncher;
 
 use crate::invoke::*;
 
+pub const AUTOSTART_ARG: &str = "--autostart";
+
 fn main() {
     tracing_subscriber::fmt::init();
-
-    #[cfg(not(windows))]
+    
     if !check_sudo() {
         std::process::exit(0);
     }
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_autostart::init(
+            MacosLauncher::LaunchAgent,
+            Some(vec![AUTOSTART_ARG]),
+        ))
+        .plugin(tauri_plugin_notification::init())
         .on_window_event(|window, event| match event {
             tauri::WindowEvent::CloseRequested { api, .. } => {
                 let _ = window.emit("close_requested", ());
-                // window.hide().unwrap();
                 api.prevent_close();
             }
             _ => {}
@@ -34,20 +40,24 @@ fn main() {
             stop_network_instance,
             collect_network_infos,
             test_config,
+            is_autostart,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
-#[cfg(not(windows))]
 fn check_sudo() -> bool {
     let is_elevated = privilege::user::privileged();
     if !is_elevated {
         let Ok(exe) = std::env::current_exe() else {
             return true;
         };
+        let args: Vec<String> = std::env::args().collect();
         let mut elevated_cmd = privilege::runas::Command::new(exe);
-        let _ = elevated_cmd.force_prompt(true).gui(true).run();
+        if args.contains(&AUTOSTART_ARG.to_owned()) {
+            elevated_cmd.arg(AUTOSTART_ARG);
+        }
+        let _ = elevated_cmd.force_prompt(true).hide(true).gui(true).run();
     }
     is_elevated
 }

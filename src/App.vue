@@ -10,8 +10,8 @@ import type { InstanceEvent, Network, NetworkInstanceInfo } from './types/networ
 const { locale, t } = useI18n()
 const appStore = useAppStore()
 const networkStore = useNetworkStore()
-const { isDark } = storeToRefs(appStore)
-const { pushInfoStack } = networkStore
+const { isDark, config } = storeToRefs(appStore)
+const { pushInfoStack, startNetwork } = networkStore
 const { networkInfo, networkList } = storeToRefs(networkStore)
 
 const theme = computed(() => (isDark.value ? darkTheme : null))
@@ -30,6 +30,15 @@ async function closeCallback() {
 }
 
 useTray(true)
+
+onBeforeMount(async () => {
+  if (await isAutostart()) {
+    await getCurrent().hide()
+    config.value.autostart.network.forEach(async (id) => {
+      await startNetwork(() => { }, id)
+    })
+  }
+})
 
 onMounted(async () => {
   eventListen.value = await listen<InstanceEvent>('easytier://event', () => {
@@ -70,9 +79,9 @@ onBeforeUnmount(() => {
         <n-modal-provider>
           <RouterView />
           <n-modal
-            v-model:show="closeModel" preset="dialog" :title="t('app.sureToExit')" :content="t('app.sureToExitContent')"
-            :positive-text="t('app.minimize')" :negative-text="t('app.exit')" @positive-click="hideCallback"
-            @negative-click="closeCallback"
+            v-model:show="closeModel" preset="dialog" :title="t('app.sureToExit')"
+            :content="t('app.sureToExitContent')" :positive-text="t('app.minimize')" :negative-text="t('app.exit')"
+            @positive-click="hideCallback" @negative-click="closeCallback"
           />
           <n-watermark
             v-if="needShowWatermark" :content="watermarkContent" cross fullscreen :font-size="16"

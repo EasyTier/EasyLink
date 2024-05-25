@@ -4,6 +4,7 @@ import { hostname } from '@tauri-apps/plugin-os'
 const appStore = useAppStore()
 const networkStore = useNetworkStore()
 const { t } = useI18n()
+const { cleanAutostartNetwork } = appStore
 const { showMultipleNetwork } = storeToRefs(appStore)
 const { removeNetwork, addNetwork } = networkStore
 const { networkList, currentNetwork, networkCurrentId, isCurrentNetworkRunning } = storeToRefs(networkStore)
@@ -16,6 +17,7 @@ function onlyAllowHostname(value: string) {
 function resetConfig() {
   if (currentNetwork.value) {
     addNetwork()
+    cleanAutostartNetwork(currentNetwork.value.config.id)
     removeNetwork(currentNetwork.value.config.id)
     nextTick(() => {
       networkCurrentId.value = networkList.value[networkList.value.length - 1]?.config.id || ''
