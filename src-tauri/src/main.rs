@@ -11,6 +11,8 @@ use crate::invoke::*;
 pub const AUTOSTART_ARG: &str = "--autostart";
 
 fn main() {
+
+    #[cfg(debug_assertions)]
     tracing_subscriber::fmt::init();
     
     if !check_sudo() {
