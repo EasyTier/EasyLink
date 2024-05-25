@@ -57,7 +57,7 @@ fn check_sudo() -> bool {
         if args.contains(&AUTOSTART_ARG.to_owned()) {
             elevated_cmd.arg(AUTOSTART_ARG);
         }
-        let _ = elevated_cmd.force_prompt(true).gui(true).run();
+        let _ = elevated_cmd.force_prompt(true).hide(true).gui(true).run();
     }
     is_elevated
 }

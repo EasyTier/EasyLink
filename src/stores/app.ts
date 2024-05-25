@@ -12,6 +12,12 @@ export const useAppStore = defineStore('appStore', () => {
     config.value.autostart.network = config.value.autostart.network.filter(item => item !== id)
   }
 
+  async function toggleAutostart(enable: boolean) {
+    const ret = await setAutostart(enable)
+    config.value.autostart.enable = ret
+    return ret
+  }
+
   return {
     isDark,
     showMultipleNetwork,
@@ -19,6 +25,7 @@ export const useAppStore = defineStore('appStore', () => {
     config,
     toggleDark,
     cleanAutostartNetwork,
+    toggleAutostart,
   }
 })
 

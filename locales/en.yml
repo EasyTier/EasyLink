@@ -54,6 +54,12 @@ component:
     confirmResetMessageTwice: Attention! Reset is not recoverable.
   networkList:
     filterResults: Filter Results
+  appConfig:
+    title: Config
+    autostart:
+      title: AutoStart
+      enable: Enabled
+      disable: Disabled
 
 app:
   sureToExit: Exit
