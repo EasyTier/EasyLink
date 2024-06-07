@@ -1,10 +1,7 @@
 use std::{
     collections::BTreeMap,
     net::Ipv4Addr,
-    sync::{
-        atomic::{AtomicBool, Ordering},
-        Arc,
-    },
+    sync::atomic::{AtomicBool, Ordering},
     time::Duration,
 };
 
@@ -16,13 +13,12 @@ use easytier::{
         config::{ConfigLoader, NetworkIdentity, PeerConfig, TomlConfigLoader, VpnPortalConfig},
         global_ctx::GlobalCtxEvent,
     },
+    launcher::{MyNodeInfo, NetworkInstance},
     rpc::{PeerInfo, Route},
-    utils::{list_peer_route_pair, PeerRoutePair},
+    utils::PeerRoutePair,
 };
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager};
-
-use crate::launcher::{Launcher, NodeInfo};
 
 #[derive(Deserialize, Serialize, Debug, Default)]
 #[serde(rename_all(serialize = "snake_case", deserialize = "camelCase"))]
@@ -158,7 +154,7 @@ impl NetworkConfig {
 #[derive(Deserialize, Serialize, Debug)]
 pub struct NetworkInstanceInfo {
     id: String,
-    node: NodeInfo,
+    node: MyNodeInfo,
     events: Vec<(DateTime<Local>, GlobalCtxEvent)>,
     routes: Vec<Route>,
     peers: Vec<PeerInfo>,
@@ -166,61 +162,6 @@ pub struct NetworkInstanceInfo {
     peer_route_pairs: Vec<PeerRoutePair>,
     running: bool,
     error: Option<String>,
-}
-
-pub struct NetworkInstance {
-    config: TomlConfigLoader,
-    app: Arc<AppHandle>,
-    launcher: Option<Launcher>,
-}
-
-impl NetworkInstance {
-    fn new(cfg: NetworkConfig, app: Arc<AppHandle>) -> Result<Self, anyhow::Error> {
-        Ok(Self {
-            config: cfg.gen_config()?,
-            app,
-            launcher: None,
-        })
-    }
-
-    fn is_easytier_running(&self) -> bool {
-        self.launcher.is_some() && self.launcher.as_ref().unwrap().running()
-    }
-
-    fn info(&self) -> Option<NetworkInstanceInfo> {
-        if self.launcher.is_none() {
-            return None;
-        }
-
-        let launcher = self.launcher.as_ref().unwrap();
-
-        let peers = launcher.peers();
-        let routes = launcher.routes();
-        let peer_route_pairs = list_peer_route_pair(peers.clone(), routes.clone());
-
-        Some(NetworkInstanceInfo {
-            id: self.config.get_id().to_string().replace('-', ""),
-            node: launcher.node(),
-            events: launcher.events(),
-            routes,
-            peers,
-            peer_route_pairs,
-            running: launcher.running(),
-            error: launcher.error(),
-        })
-    }
-
-    fn start(&mut self) -> Result<(), anyhow::Error> {
-        if self.is_easytier_running() {
-            return Ok(());
-        }
-
-        let mut launcher = Launcher::new(self.app.clone());
-        launcher.start(|| Ok(self.config.clone()));
-
-        self.launcher = Some(launcher);
-        Ok(())
-    }
 }
 
 static INSTANCE_MAP: once_cell::sync::Lazy<DashMap<String, NetworkInstance>> =
@@ -241,8 +182,8 @@ pub async fn start_network_instance(app: AppHandle, cfg: NetworkConfig) -> Resul
         return Err("instance already exists".to_string());
     }
     let id = cfg.id.clone();
-    let app_c = Arc::new(app.clone());
-    let mut instance = NetworkInstance::new(cfg, app_c).map_err(|e| e.to_string())?;
+    let cfg = cfg.gen_config().map_err(|e| e.to_string())?;
+    let mut instance = NetworkInstance::new(cfg);
     instance.start().map_err(|e| e.to_string())?;
 
     if !EMIT_INSTANCE_INFO.load(Ordering::Relaxed) {
@@ -253,8 +194,17 @@ pub async fn start_network_instance(app: AppHandle, cfg: NetworkConfig) -> Resul
             let mut flag = 0;
             loop {
                 for instance in INSTANCE_MAP.iter() {
-                    if let Some(info) = instance.info() {
-                        ret.push(info);
+                    if let Some(info) = instance.get_running_info() {
+                        ret.push(NetworkInstanceInfo {
+                            id: instance.key().clone().to_lowercase(),
+                            node: info.my_node_info,
+                            events: info.events,
+                            routes: info.routes,
+                            peers: info.peers,
+                            peer_route_pairs: info.peer_route_pairs,
+                            running: info.running,
+                            error: info.error_msg,
+                        });
                     }
                 }
 
@@ -291,8 +241,20 @@ pub fn stop_network_instance(id: String) -> Result<(), String> {
 pub fn collect_network_infos() -> Result<BTreeMap<String, NetworkInstanceInfo>, String> {
     let mut ret = BTreeMap::new();
     for instance in INSTANCE_MAP.iter() {
-        if let Some(info) = instance.info() {
-            ret.insert(instance.key().clone(), info);
+        if let Some(info) = instance.get_running_info() {
+            ret.insert(
+                instance.key().clone(),
+                NetworkInstanceInfo {
+                    id: instance.key().clone().to_lowercase(),
+                    node: info.my_node_info,
+                    events: info.events,
+                    routes: info.routes,
+                    peers: info.peers,
+                    peer_route_pairs: info.peer_route_pairs,
+                    running: info.running,
+                    error: info.error_msg,
+                },
+            );
         }
     }
     Ok(ret)
@@ -304,12 +266,9 @@ pub fn test_config(config: NetworkConfig) -> Result<NetworkConfig, String> {
     Ok(config)
 }
 
-
 #[tauri::command]
 pub fn is_autostart() -> Result<bool, String> {
     let args: Vec<String> = std::env::args().collect();
     println!("{:?}", args);
     Ok(args.contains(&crate::AUTOSTART_ARG.to_owned()))
 }
-
-
