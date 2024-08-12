@@ -1,4 +1,4 @@
-import { getCurrent } from '@tauri-apps/api/window'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import { Menu, MenuItem } from '@tauri-apps/api/menu'
 import { TrayIcon } from '@tauri-apps/api/tray'
 import { exit } from '@tauri-apps/plugin-process'
@@ -19,8 +19,8 @@ export async function useTray(init: boolean = false) {
       }),
       action: async (_e) => {
         // TODO: TypeError: window[("_" + 264693309)] is not a function
-        // if (_e.clickType === 'Double' && !await getCurrent().isVisible())
-        //   await getCurrent().show()
+        // if (_e.clickType === 'Double' && !await getCurrentWindow().isVisible())
+        //   await getCurrentWindow().show()
       },
     })
   }
@@ -58,9 +58,9 @@ export async function MenuItemShow(text: string = 'show / hide') {
     id: 'show',
     text,
     action: async () => {
-      await getCurrent().isVisible()
-        ? await getCurrent().hide()
-        : await getCurrent().show()
+      await getCurrentWindow().isVisible()
+        ? await getCurrentWindow().hide()
+        : await getCurrentWindow().show()
     },
   })
 }

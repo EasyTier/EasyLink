@@ -2,7 +2,7 @@
 
 pub mod invoke;
 
-use tauri::Manager;
+use tauri::Emitter;
 use tauri_plugin_autostart::MacosLauncher;
 
 use crate::invoke::*;

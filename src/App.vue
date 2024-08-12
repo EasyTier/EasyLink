@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getCurrent } from '@tauri-apps/api/window'
+import { getCurrentWindow } from '@tauri-apps/api/window'
 import { exit } from '@tauri-apps/plugin-process'
 import hljs from 'highlight.js'
 import type { UnlistenFn } from '@tauri-apps/api/event'
@@ -22,7 +22,7 @@ const requestListen = ref<UnlistenFn | null>(null)
 const closeModel = ref(false)
 
 async function hideCallback() {
-  await getCurrent().hide()
+  await getCurrentWindow().hide()
 }
 
 async function closeCallback() {

@@ -1,7 +1,7 @@
 {
   "productName": "easy-link",
   "version": "0.1.0",
-  "identifier": "org.easytier.link.dev",
+  "identifier": "rs.easytier.link",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -35,8 +35,7 @@
       "app",
       "dmg",
       "deb",
-      "nsis",
-      "updater"
+      "nsis"
     ],
     "icon": [
       "icons/icon.png",
