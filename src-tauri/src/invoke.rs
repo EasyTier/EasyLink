@@ -219,7 +219,7 @@ pub async fn start_network_instance(app: AppHandle, cfg: NetworkConfig) -> Resul
                     flag = 0;
                 }
 
-                let _ = app.emit("network_instance_info", &ret);
+                let _ = app.emit("easytier://info", &ret);
                 ret.clear();
                 tokio::time::sleep(Duration::from_secs(1)).await;
             }

@@ -26,7 +26,7 @@ fn main() {
         .plugin(tauri_plugin_notification::init())
         .on_window_event(|window, event| match event {
             tauri::WindowEvent::CloseRequested { api, .. } => {
-                let _ = window.emit("close_requested", ());
+                let _ = window.emit("easylink://window/close", ());
                 api.prevent_close();
             }
             _ => {}

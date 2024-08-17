@@ -33,7 +33,7 @@ useTray(true)
 
 onBeforeMount(async () => {
   if (await isAutostart()) {
-    await getCurrent().hide()
+    await getCurrentWindow().hide()
     config.value.autostart.network.forEach(async (id) => {
       await startNetwork(() => { }, id)
     })
@@ -44,7 +44,7 @@ onMounted(async () => {
   eventListen.value = await listen<InstanceEvent>('easytier://event', () => {
     // console.log(event.payload)
   })
-  infoListen.value = await listen<NetworkInstanceInfo[]>('network_instance_info', (event) => {
+  infoListen.value = await listen<NetworkInstanceInfo[]>('easytier://info', (event) => {
     // console.log(event.payload)
     networkInfo.value = [...event.payload]
     networkList.value.forEach((n: Network) => {
@@ -56,7 +56,7 @@ onMounted(async () => {
       }
     })
   })
-  requestListen.value = await listen<InstanceEvent>('close_requested', () => {
+  requestListen.value = await listen<InstanceEvent>('easylink://window/close', () => {
     closeModel.value = true
   })
 })

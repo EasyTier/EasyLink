@@ -16,7 +16,7 @@ import {
 } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
 import type { ComposeOption } from 'echarts/core'
-import type { BarSeriesOption, GraphSeriesOption, LineSeriesOption } from 'echarts/charts'
+import type { BarSeriesOption, LineSeriesOption } from 'echarts/charts'
 
 const props = defineProps<{
   stack?: number
@@ -31,12 +31,6 @@ type BaseEChartsOption = ComposeOption<
   | LineSeriesOption
   | BarSeriesOption
   | AxisPointerComponentOption
->
-
-type TopologyEChartsOption = ComposeOption<
-  | LegendComponentOption
-  | TooltipComponentOption
-  | GraphSeriesOption
 >
 
 const deviceName = ref('')
@@ -145,44 +139,6 @@ const baseOption = computed<BaseEChartsOption>(() => {
   }
 })
 
-const topologyOption = computed<TopologyEChartsOption>(() => {
-  return {
-    backgroundColor: '',
-    legend: {},
-    tooltip: {},
-    animationDuration: 1500,
-    animationEasingUpdate: 'quinticInOut',
-    series: [
-      {
-        type: 'graph',
-        layout: 'force',
-        legendHoverLink: false,
-        data: graphData.value.nodes,
-        edges: graphData.value.links,
-        categories: graphData.value.categories,
-        roam: true,
-        force: {
-          repulsion: 300,
-        },
-        label: {
-          position: 'inside',
-          formatter: '{b} - {c}',
-        },
-        lineStyle: {
-          color: 'source',
-          curveness: 0.3,
-        },
-        emphasis: {
-          focus: 'adjacency',
-          lineStyle: {
-            width: 5,
-          },
-        },
-      },
-    ],
-  }
-})
-
 onMounted(async () => {
   deviceName.value = await hostname() || ''
 })
@@ -284,14 +240,7 @@ watch(currentNetworkInfoDataStack, () => {
 
 <template>
   <n-flex w-full>
-    <n-tabs v-if="currentNetworkInfoDataStack" type="line" animated>
-      <n-tab-pane name="base" tab="base">
-        <VChart :theme="isDark ? 'dark' : undefined" class="chart" autoresize :option="baseOption" />
-      </n-tab-pane>
-      <n-tab-pane name="topology" tab="topology">
-        <VChart :theme="isDark ? 'dark' : undefined" class="chart" autoresize :option="topologyOption" />
-      </n-tab-pane>
-    </n-tabs>
+    <VChart v-if="currentNetworkInfoDataStack" :theme="isDark ? 'dark' : undefined" class="chart" autoresize :option="baseOption" />
   </n-flex>
 </template>
 
